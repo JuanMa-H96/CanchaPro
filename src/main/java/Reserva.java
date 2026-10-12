@@ -3,6 +3,15 @@ import java.time.LocalTime;
 
 public class Reserva {
     
-    private String Codigo;
-    private LocalDate fecha;    
+    private String CodigoReserva;
+    private LocalDate fecha;  
+    private LocalTime inico;
+    private double duracion;
+    private String Cancha;
+    
+    
+
+
+
+
 }
