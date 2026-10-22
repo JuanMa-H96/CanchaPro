@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package Grafica;
 
-/**
- *
- * @author juan1
- */
 public class Grafica extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Grafica.class.getName());
@@ -29,9 +21,18 @@ public class Grafica extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        disponible = new javax.swing.JButton();
+        salir = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        logo = new javax.swing.JLabel();
         reserva = new javax.swing.JButton();
+        disponible = new javax.swing.JButton();
         clientes = new javax.swing.JButton();
+        cancha = new javax.swing.JButton();
+        pago = new javax.swing.JButton();
+        reportes1 = new javax.swing.JButton();
+        tienda = new javax.swing.JButton();
+        titulo = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
         fondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -39,36 +40,140 @@ public class Grafica extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        disponible.setBackground(new java.awt.Color(0, 204, 204));
-        disponible.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        disponible.setForeground(new java.awt.Color(0, 51, 51));
-        disponible.setText("Disponibles");
-        disponible.setOpaque(true);
-        jPanel1.add(disponible, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 160, 30));
+        salir.setBackground(new java.awt.Color(255, 0, 51));
+        salir.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        salir.setForeground(new java.awt.Color(0, 51, 51));
+        salir.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\cerrar-sesion.png")); // NOI18N
+        salir.setText("Salir");
+        salir.setOpaque(true);
+        jPanel1.add(salir, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 550, 130, 40));
 
-        reserva.setBackground(new java.awt.Color(0, 204, 204));
-        reserva.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jPanel2.setBackground(new java.awt.Color(0, 0, 51));
+
+        logo.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\logo 1.png")); // NOI18N
+        logo.setText("jLabel2");
+
+        reserva.setBackground(new java.awt.Color(255, 255, 102));
+        reserva.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         reserva.setForeground(new java.awt.Color(0, 51, 51));
+        reserva.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\calendario.png")); // NOI18N
         reserva.setText("Reservas");
         reserva.setOpaque(true);
-        jPanel1.add(reserva, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, 160, 30));
+        reserva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reservaActionPerformed(evt);
+            }
+        });
 
-        clientes.setBackground(new java.awt.Color(0, 204, 204));
-        clientes.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        disponible.setBackground(new java.awt.Color(255, 255, 102));
+        disponible.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        disponible.setForeground(new java.awt.Color(0, 51, 51));
+        disponible.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\calendario.png")); // NOI18N
+        disponible.setText("Libres");
+        disponible.setOpaque(true);
+        disponible.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                disponibleActionPerformed(evt);
+            }
+        });
+
+        clientes.setBackground(new java.awt.Color(255, 255, 102));
+        clientes.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         clientes.setForeground(new java.awt.Color(0, 51, 51));
+        clientes.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\clientes.png")); // NOI18N
         clientes.setText("Clientes");
         clientes.setOpaque(true);
-        jPanel1.add(clientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 160, 30));
+
+        cancha.setBackground(new java.awt.Color(255, 255, 102));
+        cancha.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        cancha.setForeground(new java.awt.Color(0, 51, 51));
+        cancha.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\cancha.png")); // NOI18N
+        cancha.setText("Canchas");
+        cancha.setOpaque(true);
+
+        pago.setBackground(new java.awt.Color(255, 255, 102));
+        pago.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        pago.setForeground(new java.awt.Color(0, 51, 51));
+        pago.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\dinero.png")); // NOI18N
+        pago.setText("Pagos");
+        pago.setOpaque(true);
+
+        reportes1.setBackground(new java.awt.Color(255, 255, 102));
+        reportes1.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        reportes1.setForeground(new java.awt.Color(0, 51, 51));
+        reportes1.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\beneficios.png")); // NOI18N
+        reportes1.setText("Historial");
+        reportes1.setOpaque(true);
+
+        tienda.setBackground(new java.awt.Color(255, 255, 102));
+        tienda.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        tienda.setForeground(new java.awt.Color(0, 51, 51));
+        tienda.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\tienda.png")); // NOI18N
+        tienda.setText("Tienda");
+        tienda.setOpaque(true);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cancha, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(clientes, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(disponible, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(reserva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pago, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(reportes1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tienda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(logo)
+                .addGap(18, 18, 18)
+                .addComponent(reserva)
+                .addGap(18, 18, 18)
+                .addComponent(disponible)
+                .addGap(18, 18, 18)
+                .addComponent(clientes)
+                .addGap(18, 18, 18)
+                .addComponent(cancha)
+                .addGap(18, 18, 18)
+                .addComponent(pago)
+                .addGap(18, 18, 18)
+                .addComponent(reportes1)
+                .addGap(18, 18, 18)
+                .addComponent(tienda)
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 600));
+
+        titulo.setFont(new java.awt.Font("Segoe UI", 3, 48)); // NOI18N
+        titulo.setForeground(new java.awt.Color(255, 255, 255));
+        titulo.setText("Panel de Control");
+        jPanel1.add(titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, 490, 70));
+
+        usuario.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        usuario.setForeground(new java.awt.Color(255, 255, 255));
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        usuario.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\usuario.png")); // NOI18N
+        usuario.setText("Usuario: ");
+        jPanel1.add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 10, 270, 60));
 
         fondo.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\fondo.jpg")); // NOI18N
-        fondo.setText("jLabel1");
-        jPanel1.add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(1, 1, 1363, -1));
+        jPanel1.add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -77,6 +182,14 @@ public class Grafica extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disponibleActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_disponibleActionPerformed
+
+    private void reservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reservaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -104,10 +217,19 @@ public class Grafica extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cancha;
     private javax.swing.JButton clientes;
     private javax.swing.JButton disponible;
     private javax.swing.JLabel fondo;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel logo;
+    private javax.swing.JButton pago;
+    private javax.swing.JButton reportes1;
     private javax.swing.JButton reserva;
+    private javax.swing.JButton salir;
+    private javax.swing.JButton tienda;
+    private javax.swing.JLabel titulo;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 }
