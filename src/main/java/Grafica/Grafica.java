@@ -8,22 +8,22 @@ public class Grafica extends javax.swing.JFrame {
     public Grafica() {
         
         initComponents();
-         activarAtajo();
+         ocultarPestanas();
     }
- 
-private void activarAtajo() {
-    getRootPane().registerKeyboardAction(
-        e -> {
-            Config ventana = new Config();
-            ventana.setLocationRelativeTo(this);
-            ventana.setVisible(true);
-        },
-        javax.swing.KeyStroke.getKeyStroke("control N"),
-        javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW
-    );
-}
     
+private void ocultarPestanas() {
+    PanelContenido.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+        @Override
+        protected int calculateTabAreaHeight(int placement, int runCount, int maxTabHeight) {
+            return 0;
+        }
 
+        @Override
+        protected int calculateTabAreaWidth(int placement, int runCount, int maxTabWidth) {
+            return 0;
+        }
+    });
+}
 
 
     
@@ -32,185 +32,382 @@ private void activarAtajo() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        salir = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        PanelPrincipal = new javax.swing.JPanel();
+        panelmenu = new javax.swing.JPanel();
         logo = new javax.swing.JLabel();
+        panelbotones = new javax.swing.JPanel();
+        inicio = new javax.swing.JButton();
         reserva = new javax.swing.JButton();
         disponible = new javax.swing.JButton();
-        clientes = new javax.swing.JButton();
         cancha = new javax.swing.JButton();
-        pago = new javax.swing.JButton();
+        clientes = new javax.swing.JButton();
+        pagos = new javax.swing.JButton();
+        reportes = new javax.swing.JButton();
         reportes1 = new javax.swing.JButton();
-        tienda = new javax.swing.JButton();
-        titulo = new javax.swing.JLabel();
-        usuario = new javax.swing.JLabel();
-        fondo = new javax.swing.JLabel();
+        PanelContenido = new javax.swing.JTabbedPane();
+        panelinicio = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        panelreserva = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        paneldisponibilidad = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        canchapanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        clientespanel = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        pagospanel = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        reportespanel = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        PanelPrincipal.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        salir.setBackground(new java.awt.Color(255, 0, 51));
-        salir.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        salir.setForeground(new java.awt.Color(0, 51, 51));
-        salir.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\cerrar-sesion.png")); // NOI18N
-        salir.setText("Salir");
-        salir.setOpaque(true);
-        salir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                salirActionPerformed(evt);
-            }
-        });
-        jPanel1.add(salir, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 550, 130, 40));
-
-        jPanel2.setBackground(new java.awt.Color(0, 0, 51));
+        panelmenu.setBackground(new java.awt.Color(0, 0, 51));
 
         logo.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\logo 1.png")); // NOI18N
-        logo.setText("jLabel2");
 
-        reserva.setBackground(new java.awt.Color(255, 255, 102));
+        panelbotones.setBackground(new java.awt.Color(0, 0, 51));
+        panelbotones.setLayout(new javax.swing.BoxLayout(panelbotones, javax.swing.BoxLayout.LINE_AXIS));
+
+        inicio.setBackground(new java.awt.Color(0, 0, 51));
+        inicio.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        inicio.setForeground(new java.awt.Color(255, 255, 255));
+        inicio.setText("Inicio");
+        inicio.setBorder(null);
+        inicio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                inicioActionPerformed(evt);
+            }
+        });
+
+        reserva.setBackground(new java.awt.Color(0, 0, 51));
         reserva.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        reserva.setForeground(new java.awt.Color(0, 51, 51));
-        reserva.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\calendario.png")); // NOI18N
-        reserva.setText("Reservas");
-        reserva.setOpaque(true);
+        reserva.setForeground(new java.awt.Color(255, 255, 255));
+        reserva.setText("Reserva");
+        reserva.setBorder(null);
         reserva.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 reservaActionPerformed(evt);
             }
         });
 
-        disponible.setBackground(new java.awt.Color(255, 255, 102));
+        disponible.setBackground(new java.awt.Color(0, 0, 51));
         disponible.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        disponible.setForeground(new java.awt.Color(0, 51, 51));
-        disponible.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\calendario.png")); // NOI18N
-        disponible.setText("Libres");
-        disponible.setOpaque(true);
+        disponible.setForeground(new java.awt.Color(255, 255, 255));
+        disponible.setText("Disponibilidad");
+        disponible.setBorder(null);
         disponible.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 disponibleActionPerformed(evt);
             }
         });
 
-        clientes.setBackground(new java.awt.Color(255, 255, 102));
-        clientes.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        clientes.setForeground(new java.awt.Color(0, 51, 51));
-        clientes.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\clientes.png")); // NOI18N
-        clientes.setText("Clientes");
-        clientes.setOpaque(true);
-
-        cancha.setBackground(new java.awt.Color(255, 255, 102));
+        cancha.setBackground(new java.awt.Color(0, 0, 51));
         cancha.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        cancha.setForeground(new java.awt.Color(0, 51, 51));
-        cancha.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\cancha.png")); // NOI18N
-        cancha.setText("Canchas");
-        cancha.setOpaque(true);
+        cancha.setForeground(new java.awt.Color(255, 255, 255));
+        cancha.setText("Cancha");
+        cancha.setBorder(null);
+        cancha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                canchaActionPerformed(evt);
+            }
+        });
 
-        pago.setBackground(new java.awt.Color(255, 255, 102));
-        pago.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        pago.setForeground(new java.awt.Color(0, 51, 51));
-        pago.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\dinero.png")); // NOI18N
-        pago.setText("Pagos");
-        pago.setOpaque(true);
+        clientes.setBackground(new java.awt.Color(0, 0, 51));
+        clientes.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        clientes.setForeground(new java.awt.Color(255, 255, 255));
+        clientes.setText("Cientes");
+        clientes.setBorder(null);
+        clientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clientesActionPerformed(evt);
+            }
+        });
 
-        reportes1.setBackground(new java.awt.Color(255, 255, 102));
+        pagos.setBackground(new java.awt.Color(0, 0, 51));
+        pagos.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        pagos.setForeground(new java.awt.Color(255, 255, 255));
+        pagos.setText("Pagos");
+        pagos.setBorder(null);
+        pagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pagosActionPerformed(evt);
+            }
+        });
+
+        reportes.setBackground(new java.awt.Color(0, 102, 0));
+        reportes.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        reportes.setForeground(new java.awt.Color(255, 255, 255));
+        reportes.setText(" Actualizar");
+        reportes.setBorder(null);
+        reportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reportesActionPerformed(evt);
+            }
+        });
+
+        reportes1.setBackground(new java.awt.Color(0, 0, 51));
         reportes1.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        reportes1.setForeground(new java.awt.Color(0, 51, 51));
-        reportes1.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\beneficios.png")); // NOI18N
-        reportes1.setText("Historial");
-        reportes1.setOpaque(true);
+        reportes1.setForeground(new java.awt.Color(255, 255, 255));
+        reportes1.setText("Reportes");
+        reportes1.setBorder(null);
+        reportes1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reportes1ActionPerformed(evt);
+            }
+        });
 
-        tienda.setBackground(new java.awt.Color(255, 255, 102));
-        tienda.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        tienda.setForeground(new java.awt.Color(0, 51, 51));
-        tienda.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\tienda.png")); // NOI18N
-        tienda.setText("Tienda");
-        tienda.setOpaque(true);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cancha, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(clientes, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        javax.swing.GroupLayout panelmenuLayout = new javax.swing.GroupLayout(panelmenu);
+        panelmenu.setLayout(panelmenuLayout);
+        panelmenuLayout.setHorizontalGroup(
+            panelmenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelmenuLayout.createSequentialGroup()
+                .addGroup(panelmenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelbotones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(disponible, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(clientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(reserva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pago, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(reportes1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tienda, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(inicio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pagos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cancha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelmenuLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(logo))
+                    .addGroup(panelmenuLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(reportes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(panelmenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelmenuLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(reportes1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(logo)
-                .addGap(18, 18, 18)
-                .addComponent(reserva)
-                .addGap(18, 18, 18)
-                .addComponent(disponible)
-                .addGap(18, 18, 18)
-                .addComponent(clientes)
-                .addGap(18, 18, 18)
-                .addComponent(cancha)
-                .addGap(18, 18, 18)
-                .addComponent(pago)
-                .addGap(18, 18, 18)
-                .addComponent(reportes1)
-                .addGap(18, 18, 18)
-                .addComponent(tienda)
-                .addContainerGap(41, Short.MAX_VALUE))
+        panelmenuLayout.setVerticalGroup(
+            panelmenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelmenuLayout.createSequentialGroup()
+                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(inicio, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reserva, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(disponible, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cancha, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(pagos, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 113, Short.MAX_VALUE)
+                .addComponent(reportes, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelbotones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(panelmenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelmenuLayout.createSequentialGroup()
+                    .addContainerGap(517, Short.MAX_VALUE)
+                    .addComponent(reportes1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(103, 103, 103)))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 600));
+        PanelPrincipal.add(panelmenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 200, 670));
 
-        titulo.setFont(new java.awt.Font("Segoe UI", 3, 48)); // NOI18N
-        titulo.setForeground(new java.awt.Color(255, 255, 255));
-        titulo.setText("Panel de Control");
-        jPanel1.add(titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, 490, 70));
+        jLabel1.setText("jLabel1");
 
-        usuario.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
-        usuario.setForeground(new java.awt.Color(255, 255, 255));
-        usuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        usuario.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\usuario.png")); // NOI18N
-        usuario.setText("Usuario: ");
-        jPanel1.add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 10, 270, 60));
+        javax.swing.GroupLayout panelinicioLayout = new javax.swing.GroupLayout(panelinicio);
+        panelinicio.setLayout(panelinicioLayout);
+        panelinicioLayout.setHorizontalGroup(
+            panelinicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelinicioLayout.createSequentialGroup()
+                .addGap(64, 64, 64)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(749, Short.MAX_VALUE))
+        );
+        panelinicioLayout.setVerticalGroup(
+            panelinicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelinicioLayout.createSequentialGroup()
+                .addGap(62, 62, 62)
+                .addComponent(jLabel1)
+                .addContainerGap(497, Short.MAX_VALUE))
+        );
 
-        fondo.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\fondo.jpg")); // NOI18N
-        jPanel1.add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, -1, -1));
+        PanelContenido.addTab("tab1", panelinicio);
+
+        jLabel2.setText("jLabel2");
+
+        javax.swing.GroupLayout panelreservaLayout = new javax.swing.GroupLayout(panelreserva);
+        panelreserva.setLayout(panelreservaLayout);
+        panelreservaLayout.setHorizontalGroup(
+            panelreservaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelreservaLayout.createSequentialGroup()
+                .addGap(385, 385, 385)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(428, Short.MAX_VALUE))
+        );
+        panelreservaLayout.setVerticalGroup(
+            panelreservaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelreservaLayout.createSequentialGroup()
+                .addGap(234, 234, 234)
+                .addComponent(jLabel2)
+                .addContainerGap(325, Short.MAX_VALUE))
+        );
+
+        PanelContenido.addTab("tab2", panelreserva);
+
+        jLabel3.setText("jLabel3");
+
+        javax.swing.GroupLayout paneldisponibilidadLayout = new javax.swing.GroupLayout(paneldisponibilidad);
+        paneldisponibilidad.setLayout(paneldisponibilidadLayout);
+        paneldisponibilidadLayout.setHorizontalGroup(
+            paneldisponibilidadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, paneldisponibilidadLayout.createSequentialGroup()
+                .addContainerGap(741, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(72, 72, 72))
+        );
+        paneldisponibilidadLayout.setVerticalGroup(
+            paneldisponibilidadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, paneldisponibilidadLayout.createSequentialGroup()
+                .addContainerGap(354, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addGap(205, 205, 205))
+        );
+
+        PanelContenido.addTab("tab3", paneldisponibilidad);
+
+        jLabel4.setText("jLabel4");
+
+        javax.swing.GroupLayout canchapanelLayout = new javax.swing.GroupLayout(canchapanel);
+        canchapanel.setLayout(canchapanelLayout);
+        canchapanelLayout.setHorizontalGroup(
+            canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(canchapanelLayout.createSequentialGroup()
+                .addGap(45, 45, 45)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(768, Short.MAX_VALUE))
+        );
+        canchapanelLayout.setVerticalGroup(
+            canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, canchapanelLayout.createSequentialGroup()
+                .addContainerGap(536, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(23, 23, 23))
+        );
+
+        PanelContenido.addTab("tab4", canchapanel);
+
+        jLabel5.setText("jLabel5");
+
+        javax.swing.GroupLayout clientespanelLayout = new javax.swing.GroupLayout(clientespanel);
+        clientespanel.setLayout(clientespanelLayout);
+        clientespanelLayout.setHorizontalGroup(
+            clientespanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, clientespanelLayout.createSequentialGroup()
+                .addContainerGap(771, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(42, 42, 42))
+        );
+        clientespanelLayout.setVerticalGroup(
+            clientespanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(clientespanelLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(jLabel5)
+                .addContainerGap(538, Short.MAX_VALUE))
+        );
+
+        PanelContenido.addTab("tab5", clientespanel);
+
+        jLabel6.setText("jLabel6");
+
+        javax.swing.GroupLayout pagospanelLayout = new javax.swing.GroupLayout(pagospanel);
+        pagospanel.setLayout(pagospanelLayout);
+        pagospanelLayout.setHorizontalGroup(
+            pagospanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pagospanelLayout.createSequentialGroup()
+                .addContainerGap(420, Short.MAX_VALUE)
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(393, 393, 393))
+        );
+        pagospanelLayout.setVerticalGroup(
+            pagospanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pagospanelLayout.createSequentialGroup()
+                .addContainerGap(516, Short.MAX_VALUE)
+                .addComponent(jLabel6)
+                .addGap(43, 43, 43))
+        );
+
+        PanelContenido.addTab("tab6", pagospanel);
+
+        jLabel7.setText("jLabel7");
+
+        javax.swing.GroupLayout reportespanelLayout = new javax.swing.GroupLayout(reportespanel);
+        reportespanel.setLayout(reportespanelLayout);
+        reportespanelLayout.setHorizontalGroup(
+            reportespanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reportespanelLayout.createSequentialGroup()
+                .addContainerGap(617, Short.MAX_VALUE)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(196, 196, 196))
+        );
+        reportespanelLayout.setVerticalGroup(
+            reportespanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, reportespanelLayout.createSequentialGroup()
+                .addContainerGap(339, Short.MAX_VALUE)
+                .addComponent(jLabel7)
+                .addGap(220, 220, 220))
+        );
+
+        PanelContenido.addTab("tab7", reportespanel);
+
+        PanelPrincipal.add(PanelContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, 850, 610));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(PanelPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(PanelPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disponibleActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_disponibleActionPerformed
+    private void inicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inicioActionPerformed
+        PanelContenido.setSelectedIndex(0);
+    }//GEN-LAST:event_inicioActionPerformed
 
     private void reservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservaActionPerformed
-        // TODO add your handling code here:
+        PanelContenido.setSelectedIndex(1);
     }//GEN-LAST:event_reservaActionPerformed
 
-    private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_salirActionPerformed
+    private void disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disponibleActionPerformed
+        PanelContenido.setSelectedIndex(2);
+    }//GEN-LAST:event_disponibleActionPerformed
+
+    private void canchaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canchaActionPerformed
+        PanelContenido.setSelectedIndex(3);
+    }//GEN-LAST:event_canchaActionPerformed
+
+    private void clientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientesActionPerformed
+        PanelContenido.setSelectedIndex(4);
+    }//GEN-LAST:event_clientesActionPerformed
+
+    private void pagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagosActionPerformed
+        PanelContenido.setSelectedIndex(5);
+    }//GEN-LAST:event_pagosActionPerformed
+
+    private void reportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportesActionPerformed
+        PanelContenido.setSelectedIndex(6);
+    }//GEN-LAST:event_reportesActionPerformed
+
+    private void reportes1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportes1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reportes1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -238,19 +435,32 @@ private void activarAtajo() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTabbedPane PanelContenido;
+    private javax.swing.JPanel PanelPrincipal;
     private javax.swing.JButton cancha;
+    private javax.swing.JPanel canchapanel;
     private javax.swing.JButton clientes;
+    private javax.swing.JPanel clientespanel;
     private javax.swing.JButton disponible;
-    private javax.swing.JLabel fondo;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton inicio;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel logo;
-    private javax.swing.JButton pago;
+    private javax.swing.JButton pagos;
+    private javax.swing.JPanel pagospanel;
+    private javax.swing.JPanel panelbotones;
+    private javax.swing.JPanel paneldisponibilidad;
+    private javax.swing.JPanel panelinicio;
+    private javax.swing.JPanel panelmenu;
+    private javax.swing.JPanel panelreserva;
+    private javax.swing.JButton reportes;
     private javax.swing.JButton reportes1;
+    private javax.swing.JPanel reportespanel;
     private javax.swing.JButton reserva;
-    private javax.swing.JButton salir;
-    private javax.swing.JButton tienda;
-    private javax.swing.JLabel titulo;
-    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 }
