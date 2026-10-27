@@ -1,8 +1,19 @@
+package Datos;
+
+
 public class Clientes {
     private int Codigo;
     private String Nombre;
     private int Telefono;
-    private String Correo;
+    private String email;
+    
+    
+    public Clientes(int Codigo, String Nombre, int Telefono, String email){
+        this.Codigo=Codigo;
+        this.Nombre=Nombre;
+        this.Telefono=Telefono;
+        this.email=email;
+    }
 
     public void setCodigo(int Codigo) {
         this.Codigo = Codigo;
@@ -16,8 +27,8 @@ public class Clientes {
         this.Telefono = Telefono;
     }
 
-    public void setCorreo(String Correo) {
-        this.Correo = Correo;
+    public void setCorreo(String email) {
+        this.email = email;
     }
 
     public int getCodigo() {
@@ -32,8 +43,8 @@ public class Clientes {
         return Telefono;
     }
 
-    public String getCorreo() {
-        return Correo;
+    public String getemail() {
+        return email;
     }
     
     public void registrar(){

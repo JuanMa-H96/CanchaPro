@@ -1,4 +1,4 @@
-package Logica;
+package Datos;
 
 public class Pago {
     

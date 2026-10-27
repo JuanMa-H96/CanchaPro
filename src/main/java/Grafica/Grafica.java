@@ -1,4 +1,9 @@
 package Grafica;
+
+import Datos.Clientes;
+import Logica.PersistenciaCsv;
+
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 
 public class Grafica extends javax.swing.JFrame {
@@ -10,6 +15,12 @@ public class Grafica extends javax.swing.JFrame {
         
         initComponents();
          ocultarPestanas();
+         tablaClientes.getColumnModel().getColumn(0).setPreferredWidth(50);
+         tablaClientes.getColumnModel().getColumn(1).setPreferredWidth(150);
+         tablaClientes.getColumnModel().getColumn(2).setPreferredWidth(75);
+         tablaClientes.getColumnModel().getColumn(3).setPreferredWidth   (200);
+         
+         mostrarClientes();
     }
     
 private void ocultarPestanas() {
@@ -26,6 +37,27 @@ private void ocultarPestanas() {
     });
 }
 
+private void mostrarClientes(){
+    PersistenciaCsv archivo = new PersistenciaCsv();
+    Clientes[] clientes = archivo.leerClientes();
+    
+    DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
+    modelo.setRowCount(0);
+    
+    for(int i=0; i< clientes.length; i++){
+        
+        if(clientes[i] !=null){
+            modelo.addRow(new Object[]{
+            clientes[i].getCodigo(),
+            clientes[i].getNombre(),
+              clientes[i].getTelefono(),
+                clientes[i].getemail()});
+            
+        }
+        
+    }
+    
+}
 
     
     
@@ -111,7 +143,7 @@ private void ocultarPestanas() {
         jPanel1 = new javax.swing.JPanel();
         jLabel54 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaClientes = new javax.swing.JTable();
         panelreserva = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -734,26 +766,26 @@ private void ocultarPestanas() {
             }
         });
 
-        jLabel56.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel56.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel56.setText("Codigo");
+        jLabel56.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
 
-        jLabel58.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel58.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel58.setText("Telefono");
+        jLabel58.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
 
+        bRegistrar.setText("Registrar");
         bRegistrar.setBackground(new java.awt.Color(204, 204, 204));
         bRegistrar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
-        bRegistrar.setText("Registrar");
         bRegistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bRegistrarActionPerformed(evt);
             }
         });
 
-        jLabel61.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel61.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel61.setText("Nombre");
+        jLabel61.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
 
         telefono.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -764,18 +796,18 @@ private void ocultarPestanas() {
             }
         });
 
-        jLabel59.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel59.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel59.setText("e-mail");
+        jLabel59.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("C001");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
 
-        jLabel55.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        jLabel55.setForeground(new java.awt.Color(255, 0, 0));
         jLabel55.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel55.setText("Registrar Cliente");
+        jLabel55.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        jLabel55.setForeground(new java.awt.Color(255, 0, 0));
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
@@ -831,9 +863,9 @@ private void ocultarPestanas() {
 
         jPanel14.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel60.setText("Gestion de Clientes");
         jLabel60.setBackground(new java.awt.Color(255, 255, 255));
         jLabel60.setFont(new java.awt.Font("Segoe UI", 3, 48)); // NOI18N
-        jLabel60.setText("Gestion de Clientes");
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
@@ -853,24 +885,20 @@ private void ocultarPestanas() {
 
         jPanel1.setBorder(new javax.swing.border.MatteBorder(null));
 
-        jLabel54.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        jLabel54.setForeground(new java.awt.Color(255, 0, 0));
         jLabel54.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel54.setText("Lista de Clientes");
+        jLabel54.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        jLabel54.setForeground(new java.awt.Color(255, 0, 0));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Codigo", "Nombre", "Telefono", "E-mail"
             }
         ));
-        jTable1.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaClientes);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1110,7 +1138,6 @@ private void ocultarPestanas() {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel logo;
     private javax.swing.JTextField nombre;
@@ -1123,6 +1150,7 @@ private void ocultarPestanas() {
     private javax.swing.JButton reportes;
     private javax.swing.JPanel reportespanel;
     private javax.swing.JButton reserva;
+    private javax.swing.JTable tablaClientes;
     private javax.swing.JTextField telefono;
     private com.github.lgooddatepicker.components.TimePicker timePicker2;
     // End of variables declaration//GEN-END:variables

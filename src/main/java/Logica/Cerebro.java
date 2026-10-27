@@ -1,9 +1,14 @@
-//---------------------Centro de Opereciones---------------------//
 package Logica;
 
+//---------------------Centro de Opereciones---------------------//
+
+
+import Datos.Clientes;
 import Grafica.Login;
 import Grafica.Grafica;
 import javax.swing.JOptionPane;
+
+
 
 
 public class Cerebro {
@@ -24,6 +29,15 @@ public class Cerebro {
       
     }
     
+    private Clientes[] clientes=new Clientes[1000];
+    private int cantidadClientes = 0;
+    
+    public void registrarCliente(String nombre, String telefono, String email){
+        if(cantidadClientes==clientes.length){
+            Clientes[]nuevosClientes= new Clientes[clientes.length+100];
+        }
+        
+    }
     
     
     

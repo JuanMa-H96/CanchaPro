@@ -1,4 +1,4 @@
-package Logica;
+package Datos;
 
 import java.time.LocalDate;
 import java.time.LocalDate;
