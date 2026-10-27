@@ -5,13 +5,30 @@
     <artifactId>CanchaPro</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>org.netbeans.external</groupId>
-            <artifactId>AbsoluteLayout</artifactId>
-            <version>RELEASE260</version>
-        </dependency>
-    </dependencies>
+
+<dependencies>
+    <dependency>
+        <groupId>org.netbeans.external</groupId>
+        <artifactId>AbsoluteLayout</artifactId>
+        <version>RELEASE260</version>
+    </dependency>
+
+<dependency>
+    <groupId>com.toedter</groupId>
+    <artifactId>jcalendar</artifactId>
+    <version>1.4</version>
+</dependency>
+
+<dependency>
+    <groupId>com.github.lgooddatepicker</groupId>
+    <artifactId>LGoodDatePicker</artifactId>
+    <version>11.2.1</version>
+</dependency>
+
+</dependencies>
+
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
