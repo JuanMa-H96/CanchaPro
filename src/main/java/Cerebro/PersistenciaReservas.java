@@ -44,19 +44,19 @@ public class PersistenciaReservas {
             Cliente cliente = persistenciaClientes.buscarCliente(datos[1].trim());
             Cancha cancha = persistenciaCanchas.buscarCancha(datos[2].trim());
 
-            Reserva reserva = new Reserva(
-                idReserva,
-                cliente,
-                cancha,
-                LocalDate.parse(datos[3].trim()),
-                LocalTime.parse(datos[5].trim()),
-                Integer.parseInt(datos[6].trim()),
-                Boolean.parseBoolean(datos[8].trim()),
-                Boolean.parseBoolean(datos[9].trim()),
-                Boolean.parseBoolean(datos[10].trim())
-            );
+          Reserva reserva = new Reserva(
+            idReserva,
+            cliente,
+            cancha,
+            LocalDate.parse(datos[3].trim()),
+            LocalTime.parse(datos[5].trim()),
+            Integer.parseInt(datos[6].trim()),
+            Integer.parseInt(datos[8].trim()),  // cantidad de balones
+            Integer.parseInt(datos[9].trim()),  // cantidad de árbitros
+            Integer.parseInt(datos[10].trim())  // cantidad de chalecos
+    );
 
-            reserva.setEstado(datos[4].trim());
+reserva.setEstado(datos[4].trim());
 
 reservas[cantidad] = reserva;
 cantidad++;
@@ -89,9 +89,7 @@ cantidad++;
         }
     }
 }
-    
-    
-    
+  
     public void mostrarReservas(JTable tabla) {
         String[] columnas = {
             "Código", "Cliente", "Cancha", "Fecha", "Horario", "Estado"
@@ -140,61 +138,17 @@ cantidad++;
         tabla.setModel(modelo);
     }
     
-    
-    
-    
-    
-    public void probarLecturaConJOptionPane() {
-    leerReservas();
-
-    if (cantidad == 0) {
-        JOptionPane.showMessageDialog(
-                null,
-                "No se cargaron reservas. Revisa la ruta del CSV y la consola.",
-                "Prueba de reservas",
-                JOptionPane.WARNING_MESSAGE
-        );
-        return;
+    public int getCantidadReservas() {
+    return cantidad;
     }
 
-    String texto = "";
-
-    for (int i = 0; i < cantidad; i++) {
-        Reserva reserva = reservas[i];
-
-        texto += "Reserva: R"
-                + String.format("%03d", reserva.getIdReserva())
-                + "\nCliente: " + reserva.getCliente().getNombre()
-                + "\nCancha: " + reserva.getCancha().getNombre()
-                + "\nFecha: " + reserva.getFecha()
-                + "\nHorario: " + reserva.getHoraInicio()
-                + " - " + reserva.getHoraFinal()
-                + "\nEstado: " + reserva.getEstado()
-                + "\n-----------------------------\n";
-    }
-
-    JOptionPane.showMessageDialog(
-            null,
-            texto,
-            "Reservas leídas: " + cantidad,
-            JOptionPane.INFORMATION_MESSAGE
-    );
-}
+    public Reserva getReserva(int posicion) {
+    return reservas[posicion];
+    }   
     
     
     
+    //falta el metodo de guardar reservas
     
-    
-    
-    
-    
-    
-    
-    
-
-
-
-    
-    
-    
+      
 }

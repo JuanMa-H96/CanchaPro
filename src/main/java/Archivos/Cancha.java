@@ -13,9 +13,7 @@ public class Cancha {
     private LocalTime horaCierre;
     private boolean activo = true;
 
-    public Cancha(String codigo, String nombre, int tipoFutbol,
-                  double precioHora, String estado,
-                  LocalTime horaApertura, LocalTime horaCierre) {
+    public Cancha(String codigo, String nombre, int tipoFutbol, double precioHora, String estado, LocalTime horaApertura, LocalTime horaCierre){
         this.codigo = codigo;
         this.nombre = nombre;
         setTipoFutbol(tipoFutbol);

@@ -14,13 +14,17 @@ public class Reserva {
     private LocalTime horaFinal;
     private String estado;
 
-    private boolean balon;
-    private boolean arbitro;
-    private boolean chalecos;
+    private int balon;
+    private int arbitro;
+    private int chalecos;
 
-    public Reserva(
-            int idReserva,Cliente cliente,Cancha cancha,LocalDate fecha,LocalTime horaInicio,int duracionHoras,
-            boolean balon,boolean arbitro,boolean chalecos){
+    public Reserva(int idReserva, Cliente cliente, Cancha cancha, LocalDate fecha, LocalTime horaInicio, int duracionHoras,
+            int balon, int arbitro, int chalecos){
+       
+        validarCantidad(balon);
+        validarCantidad(arbitro);
+        validarCantidad(chalecos);
+
         this.idReserva = idReserva;
         this.cliente = cliente;
         this.cancha = cancha;
@@ -67,15 +71,15 @@ public class Reserva {
         return estado;
     }
 
-    public boolean isBalon() {
+    public int getBalon() {
         return balon;
     }
 
-    public boolean isArbitro() {
+    public int getArbitro() {
         return arbitro;
     }
 
-    public boolean isChalecos() {
+    public int getChalecos() {
         return chalecos;
     }
 
@@ -101,6 +105,10 @@ public class Reserva {
     }
 
     public void setDuracionHoras(int duracionHoras) {
+        if (duracionHoras <= 0) {
+            throw new IllegalArgumentException("La duración debe ser mayor que cero.");
+        }
+
         this.duracionHoras = duracionHoras;
         actualizarHoraFinal();
     }
@@ -109,15 +117,18 @@ public class Reserva {
         this.estado = estado;
     }
 
-    public void setBalon(boolean balon) {
+    public void setBalon(int balon) {
+        validarCantidad(balon);
         this.balon = balon;
     }
 
-    public void setArbitro(boolean arbitro) {
+    public void setArbitro(int arbitro) {
+        validarCantidad(arbitro);
         this.arbitro = arbitro;
     }
 
-    public void setChalecos(boolean chalecos) {
+    public void setChalecos(int chalecos) {
+        validarCantidad(chalecos);
         this.chalecos = chalecos;
     }
 
@@ -128,6 +139,12 @@ public class Reserva {
     private void actualizarHoraFinal() {
         if (horaInicio != null && duracionHoras > 0) {
             horaFinal = horaInicio.plusHours(duracionHoras);
+        }
+    }
+
+    private void validarCantidad(int cantidad) {
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
         }
     }
 }
