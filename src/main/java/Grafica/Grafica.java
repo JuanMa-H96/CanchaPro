@@ -1,25 +1,47 @@
 package Grafica;
-import cerebro.PersistenciaCsv;
-import Archivos.Cliente;
 
 
-import javax.swing.table.DefaultTableModel;
+import Cerebro.PersistenciaClientes;
+import Cerebro.PersistenciaCancha; 
 import javax.swing.JOptionPane;
+
+import Archivos.Cliente;
+import javax.swing.table.DefaultTableModel;
+
+import Archivos.Cancha;
+import java.awt.GridLayout;
+import javax.swing.BoxLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+
+
+
 
 public class Grafica extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Grafica.class.getName());
-    private PersistenciaCsv persistencia = new PersistenciaCsv();
-   
+    private PersistenciaClientes persistencia = new PersistenciaClientes();
+    private PersistenciaCancha persistenciacancha = new PersistenciaCancha();
+    private Cancha canchaSelecionada;
+    
     public Grafica() {
         
         
         initComponents();
+        ocultarPestanas();
+        
+        //clientes
          persistencia.leerClientes();
          mostrarClientesEnTabla();
         
-         ocultarPestanas();
-    
+         //canchas
+         jScrollPane2.setViewportView(panelListaCanchas);
+        persistenciacancha.leerCanchas();
+         mostrarCanchasEnGrafica();
+         
+         
     }
     
     
@@ -65,7 +87,68 @@ private void limpiarCamposCliente() {
     mcodigo.setText("");
 }
 
-    
+   void mostrarCanchasEnGrafica() {
+    panelListaCanchas.removeAll();
+    panelListaCanchas.setLayout(new GridLayout(0, 2, 10, 10));
+
+    for (int i = 0; i < persistenciacancha.getCantidadCanchas(); i++) {
+        Cancha cancha = persistenciacancha.getCancha(i);
+        
+         if (!cancha.isActivo()) {
+            continue; // No crea una tarjeta para esta cancha
+        }
+         
+        JPanel tarjeta = new JPanel();
+        tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+        tarjeta.setBorder(
+            BorderFactory.createTitledBorder(cancha.getNombre())
+        );
+
+        tarjeta.add(new JLabel("Código: " + cancha.getCodigo()));
+        tarjeta.add(new JLabel("Fútbol " + cancha.getTipoFutbol()));
+        tarjeta.add(new JLabel("Precio por hora: Q" + cancha.getPrecioHora()));
+        tarjeta.add(new JLabel("Estado: " + cancha.getEstado()));
+        tarjeta.add(new JLabel("Horario: " + cancha.getHoraApertura()
+                + " - " + cancha.getHoraCierre()));
+
+        JButton modificar = new JButton("Modificar");
+
+        modificar.addActionListener(e -> {
+            Grafica.this.setVisible(false);
+
+            nuevaCancha ventana = new nuevaCancha(persistenciacancha,Grafica.this,cancha);
+            ventana.setLocationRelativeTo(null);
+            ventana.setVisible(true);
+        });
+
+        tarjeta.add(modificar);
+        JButton eliminar = new JButton("Eliminar");
+        eliminar.addActionListener(e -> {
+               int respuesta = JOptionPane.showConfirmDialog(
+                   null,
+                   "¿Quieres eliminar esta cancha?",
+                   "Confirmar",
+                   JOptionPane.YES_NO_OPTION
+                );
+
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    persistenciacancha.eliminarCancha(cancha.getCodigo());
+                    mostrarCanchasEnGrafica();
+                }
+            });
+
+            tarjeta.add(eliminar);
+        
+        
+        
+        
+        
+        panelListaCanchas.add(tarjeta);
+    }
+
+    panelListaCanchas.revalidate();
+    panelListaCanchas.repaint();
+}
     
     @SuppressWarnings("unchecked")  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -132,7 +215,11 @@ private void limpiarCamposCliente() {
         clientespanel = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         pagospanel = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel62 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        panelListaCanchas = new javax.swing.JPanel();
+        nuevachancha = new javax.swing.JButton();
         reportespanel = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jLabel58 = new javax.swing.JLabel();
@@ -750,23 +837,76 @@ private void limpiarCamposCliente() {
 
         PanelContenido.addTab("disponiblidad", clientespanel);
 
-        jLabel6.setText("jLabel6");
+        jLabel62.setText("Gestion de Clientes");
+        jLabel62.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel62.setFont(new java.awt.Font("Segoe UI", 3, 48)); // NOI18N
+
+        javax.swing.GroupLayout panelListaCanchasLayout = new javax.swing.GroupLayout(panelListaCanchas);
+        panelListaCanchas.setLayout(panelListaCanchasLayout);
+        panelListaCanchasLayout.setHorizontalGroup(
+            panelListaCanchasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 778, Short.MAX_VALUE)
+        );
+        panelListaCanchasLayout.setVerticalGroup(
+            panelListaCanchasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 572, Short.MAX_VALUE)
+        );
+
+        jScrollPane2.setViewportView(panelListaCanchas);
+
+        nuevachancha.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        nuevachancha.setText("Crear Nueva Cancha");
+        nuevachancha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nuevachanchaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 786, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel62, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(261, 261, 261)
+                .addComponent(nuevachancha, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel62)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(nuevachancha, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout pagospanelLayout = new javax.swing.GroupLayout(pagospanel);
         pagospanel.setLayout(pagospanelLayout);
         pagospanelLayout.setHorizontalGroup(
             pagospanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pagospanelLayout.createSequentialGroup()
-                .addContainerGap(380, Short.MAX_VALUE)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(393, 393, 393))
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         pagospanelLayout.setVerticalGroup(
             pagospanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pagospanelLayout.createSequentialGroup()
-                .addContainerGap(646, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addGap(43, 43, 43))
+            .addGroup(pagospanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         PanelContenido.addTab("cancha", pagospanel);
@@ -935,18 +1075,18 @@ private void limpiarCamposCliente() {
         jLabel56.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel56.setForeground(new java.awt.Color(255, 0, 0));
 
+        Modificar.setText("Modificar");
         Modificar.setBackground(new java.awt.Color(204, 204, 204));
         Modificar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
-        Modificar.setText("Modificar");
         Modificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ModificarActionPerformed(evt);
             }
         });
 
+        eliminar.setText("Eliminar");
         eliminar.setBackground(new java.awt.Color(204, 204, 204));
         eliminar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
-        eliminar.setText("Eliminar");
         eliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 eliminarActionPerformed(evt);
@@ -1125,38 +1265,53 @@ private void limpiarCamposCliente() {
       
     }//GEN-LAST:event_actualizarActionPerformed
 
-    private void bRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bRegistrarActionPerformed
-   String nombre = nombre1.getText().trim();
-   String numeroTelefono = telefono.getText().trim();
-   String correo = email.getText().trim();
+    private void eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarActionPerformed
 
-   if (nombre.isEmpty() || numeroTelefono.isEmpty() || correo.isEmpty()) {
-       JOptionPane.showMessageDialog(null, "Ingrese todos lo campos.");
-   } else {
+        boolean resultado = persistencia.eliminarCliente(mcodigo.getText());
 
-       String codigo = persistencia.agregarCliente(nombre, numeroTelefono, correo);
+        if (resultado) {
 
-       if (codigo != null) {
-           mostrarClientesEnTabla();
+            mostrarClientesEnTabla();
 
-           JOptionPane.showMessageDialog(null, "Cliente registrado.\n Nombre: "+ nombre + "\nTelefono: "+ numeroTelefono + "\nEmail :" + correo + "\nCódigo: " + codigo);
+            JOptionPane.showMessageDialog(null, "Cliente eliminado correctamente.");
 
-           nombre1.setText("");
-           telefono.setText("");
-           email.setText("");
-       } else {
-           JOptionPane.showMessageDialog(null, "No se pueden agregar más clientes.");
-       }
-   }
-    }//GEN-LAST:event_bRegistrarActionPerformed
+            limpiarCamposCliente();
 
-    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_emailActionPerformed
+        } else {
+            JOptionPane.showMessageDialog(null, "Busque primero un cliente.");
+        }
 
-    private void nombre1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombre1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nombre1ActionPerformed
+    }//GEN-LAST:event_eliminarActionPerformed
+
+    private void ModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModificarActionPerformed
+
+        if (mnombre.getText().isEmpty() ||
+            mtelefono.getText().isEmpty() ||
+            mcorreo.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(null, "Ingrese todos los campos.");
+            return;
+        }
+
+        boolean resultado = persistencia.modificarCliente(
+            mcodigo.getText(),
+            mnombre.getText(),
+            mtelefono.getText(),
+            mcorreo.getText()
+        );
+
+        if (resultado) {
+
+            mostrarClientesEnTabla();
+
+            JOptionPane.showMessageDialog(null, "Cliente modificado correctamente.");
+            limpiarCamposCliente();
+
+        } else {
+
+            JOptionPane.showMessageDialog(null, "No se pudo modificar el cliente.");
+        }
+    }//GEN-LAST:event_ModificarActionPerformed
 
     private void busquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_busquedaActionPerformed
 
@@ -1185,68 +1340,55 @@ private void limpiarCamposCliente() {
 
             JOptionPane.showMessageDialog(null, "Cliente no encontrado.");
 
-           limpiarCamposCliente();
+            limpiarCamposCliente();
 
             Modificar.setEnabled(false);
         }
-        
+
     }//GEN-LAST:event_buscarActionPerformed
 
-    private void ModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModificarActionPerformed
-        
-        if (mnombre.getText().isEmpty() ||
-            mtelefono.getText().isEmpty() ||
-            mcorreo.getText().isEmpty()) {
+    private void nombre1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombre1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nombre1ActionPerformed
 
-            JOptionPane.showMessageDialog(null, "Ingrese todos los campos.");
-            return;
-        }
+    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_emailActionPerformed
 
-        boolean resultado = persistencia.modificarCliente(
-            mcodigo.getText(),
-            mnombre.getText(),
-            mtelefono.getText(),
-            mcorreo.getText()
-        );
+    private void bRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bRegistrarActionPerformed
+        String nombre = nombre1.getText().trim();
+        String numeroTelefono = telefono.getText().trim();
+        String correo = email.getText().trim();
 
-        if (resultado) {
-
-            mostrarClientesEnTabla();
-
-            JOptionPane.showMessageDialog(null, "Cliente modificado correctamente.");
-           limpiarCamposCliente();
-
+        if (nombre.isEmpty() || numeroTelefono.isEmpty() || correo.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Ingrese todos lo campos.");
         } else {
 
-            JOptionPane.showMessageDialog(null, "No se pudo modificar el cliente.");
+            String codigo = persistencia.agregarCliente(nombre, numeroTelefono, correo);
+
+            if (codigo != null) {
+                mostrarClientesEnTabla();
+
+                JOptionPane.showMessageDialog(null, "Cliente registrado.\n Nombre: "+ nombre + "\nTelefono: "+ numeroTelefono + "\nEmail :" + correo + "\nCódigo: " + codigo);
+
+                nombre1.setText("");
+                telefono.setText("");
+                email.setText("");
+            } else {
+                JOptionPane.showMessageDialog(null, "No se pueden agregar más clientes.");
+            }
         }
-    }//GEN-LAST:event_ModificarActionPerformed
+    }//GEN-LAST:event_bRegistrarActionPerformed
 
-    private void eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarActionPerformed
+    private void nuevachanchaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nuevachanchaActionPerformed
+            setVisible(false);
 
-        boolean resultado = persistencia.eliminarCliente(mcodigo.getText());
-
-    if (resultado) {
-
-        mostrarClientesEnTabla();
-
-        JOptionPane.showMessageDialog(null, "Cliente eliminado correctamente.");
-
-       limpiarCamposCliente();
-
-    } else {
-        JOptionPane.showMessageDialog(null, "Busque primero un cliente.");
-    }
-
-        
-        
-        
-    }//GEN-LAST:event_eliminarActionPerformed
+    nuevaCancha ventana = new nuevaCancha(persistenciacancha, this, null);
+    ventana.setLocationRelativeTo(null);
+    ventana.setVisible(true);
+    }//GEN-LAST:event_nuevachanchaActionPerformed
 
    
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new Grafica().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Modificar;
@@ -1306,20 +1448,22 @@ private void limpiarCamposCliente() {
     private javax.swing.JLabel jLabel56;
     private javax.swing.JLabel jLabel58;
     private javax.swing.JLabel jLabel59;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel60;
     private javax.swing.JLabel jLabel61;
+    private javax.swing.JLabel jLabel62;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel logo;
     private javax.swing.JLabel mcodigo;
@@ -1327,8 +1471,10 @@ private void limpiarCamposCliente() {
     private javax.swing.JTextField mnombre;
     private javax.swing.JTextField mtelefono;
     private javax.swing.JTextField nombre1;
+    private javax.swing.JButton nuevachancha;
     private javax.swing.JButton pagos;
     private javax.swing.JPanel pagospanel;
+    private javax.swing.JPanel panelListaCanchas;
     private javax.swing.JPanel panelbotones;
     private javax.swing.JPanel panelinicio;
     private javax.swing.JPanel panelmenu;

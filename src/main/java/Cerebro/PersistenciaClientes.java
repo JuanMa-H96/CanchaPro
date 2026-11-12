@@ -1,25 +1,32 @@
-package cerebro;
+package Cerebro;
 
 import Archivos.Cliente;
+
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalTime;
 import javax.swing.JOptionPane;
 
-public class PersistenciaCsv {
+public class PersistenciaClientes {
+    
+    //RUTAS
+    String ruta = "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia/clientes.csv";
+    
 
+    //AREGLOS
     private Cliente[] clientes = new Cliente[1000];
     private int cantidad = 0;
-
+    
+   
   
-
+    //CLIENTES
     public void leerClientes() {
-
-        String ruta = "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia/clientes.csv";
-
-        try {
+         try {
             BufferedReader lector = new BufferedReader(new FileReader(ruta));
             String linea = lector.readLine();
             
@@ -51,19 +58,14 @@ public class PersistenciaCsv {
             System.out.println("Error al leer el archivo: " + e.getMessage());
         }
     }
-
-   
-
+    
     public int getCantidad() {
         return cantidad;
     }
 
-  
-
     public Cliente getCliente(int posicion) {
         return clientes[posicion];
     }
-
 
     public String agregarCliente(String nombre, String telefono, String email) {
 
@@ -79,8 +81,6 @@ public class PersistenciaCsv {
 
         return codigo;
     }
-
- 
 
     public Cliente buscarCliente(String dato) {
 
@@ -100,8 +100,6 @@ public class PersistenciaCsv {
         return null;
     }
 
-    
-
     public boolean modificarCliente(String codigo, String nombre, String telefono, String email) {
 
         for (int i = 0; i < cantidad; i++) {
@@ -118,8 +116,6 @@ public class PersistenciaCsv {
 
         return false;
     }
-
-
 
     public boolean eliminarCliente(String codigo) {
 
@@ -138,11 +134,11 @@ public class PersistenciaCsv {
         return false;
     }
 
-    /*GUARDAR CLIENTES
+    //GUARDAR CLIENTES
 
     public void guardarClientes() {
 
-        String ruta = "C:\\Users\\juan1\\OneDrive\\Desktop\\Clientes.csv";
+        String ruta = "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia/clientes.csv";
 
         try {
 
@@ -170,5 +166,5 @@ public class PersistenciaCsv {
 
             JOptionPane.showMessageDialog(null, "Error al guardar clientes.");
         }
-    }*/
+    }
 }
