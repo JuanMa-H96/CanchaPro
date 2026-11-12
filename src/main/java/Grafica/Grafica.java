@@ -45,16 +45,25 @@ private void mostrarClientesEnTabla() {
 
     for (int i = 0; i < persistencia.getCantidad(); i++) {
         Cliente cliente = persistencia.getCliente(i);
-
+            
+        if(cliente.isActivo()){
         modelo.addRow(new Object[]{
             cliente.getCodigo(),
             cliente.getNombre(),
             cliente.getTelefono(),
             cliente.getEmail()
         });
+        }
     }
 }
 
+private void limpiarCamposCliente() {
+    busqueda.setText("");
+    mnombre.setText("");
+    mtelefono.setText("");
+    mcorreo.setText("");
+    mcodigo.setText("");
+}
 
     
     
@@ -140,9 +149,15 @@ private void mostrarClientesEnTabla() {
         jLabel54 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaClientes = new javax.swing.JTable();
-        bRegistrar1 = new javax.swing.JButton();
+        buscar = new javax.swing.JButton();
         busqueda = new javax.swing.JTextField();
         jLabel56 = new javax.swing.JLabel();
+        mnombre = new javax.swing.JTextField();
+        mcorreo = new javax.swing.JTextField();
+        mtelefono = new javax.swing.JTextField();
+        Modificar = new javax.swing.JButton();
+        mcodigo = new javax.swing.JLabel();
+        eliminar = new javax.swing.JButton();
         panelreserva = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -899,12 +914,12 @@ private void mostrarClientesEnTabla() {
         tablaClientes.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(tablaClientes);
 
-        bRegistrar1.setBackground(new java.awt.Color(204, 204, 204));
-        bRegistrar1.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
-        bRegistrar1.setText("Buscar");
-        bRegistrar1.addActionListener(new java.awt.event.ActionListener() {
+        buscar.setText("Buscar");
+        buscar.setBackground(new java.awt.Color(204, 204, 204));
+        buscar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        buscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bRegistrar1ActionPerformed(evt);
+                buscarActionPerformed(evt);
             }
         });
 
@@ -915,23 +930,38 @@ private void mostrarClientesEnTabla() {
             }
         });
 
-        jLabel56.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        jLabel56.setForeground(new java.awt.Color(255, 0, 0));
         jLabel56.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel56.setText("Buscar Cliente");
+        jLabel56.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        jLabel56.setForeground(new java.awt.Color(255, 0, 0));
+
+        Modificar.setBackground(new java.awt.Color(204, 204, 204));
+        Modificar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        Modificar.setText("Modificar");
+        Modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ModificarActionPerformed(evt);
+            }
+        });
+
+        eliminar.setBackground(new java.awt.Color(204, 204, 204));
+        eliminar.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        eliminar.setText("Eliminar");
+        eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel56, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1)
+                    .addComponent(jLabel56, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -940,12 +970,30 @@ private void mostrarClientesEnTabla() {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(176, 176, 176)
-                        .addComponent(bRegistrar1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(176, 176, 176)
+                                .addComponent(buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel54, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel54, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mnombre, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(mcorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(mtelefono, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                            .addComponent(mcodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(55, 55, 55)
+                .addComponent(Modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(58, 58, 58))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -955,8 +1003,20 @@ private void mostrarClientesEnTabla() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bRegistrar1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(64, 64, 64)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mnombre, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(mtelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(53, 53, 53)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(mcorreo, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                    .addComponent(mcodigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel54, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1066,78 +1126,142 @@ private void mostrarClientesEnTabla() {
     }//GEN-LAST:event_actualizarActionPerformed
 
     private void bRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bRegistrarActionPerformed
-    String codigo = persistencia.agregarCliente(
-        busqueda.getText().trim(),
-        telefono.getText().trim(),
-        email.getText().trim()
-    );
+   String nombre = nombre1.getText().trim();
+   String numeroTelefono = telefono.getText().trim();
+   String correo = email.getText().trim();
 
-    if (codigo != null) {
-        mostrarClientesEnTabla();
+   if (nombre.isEmpty() || numeroTelefono.isEmpty() || correo.isEmpty()) {
+       JOptionPane.showMessageDialog(null, "Ingrese todos lo campos.");
+   } else {
 
-        JOptionPane.showMessageDialog(null, "Cliente registrado. Código: " + codigo);
+       String codigo = persistencia.agregarCliente(nombre, numeroTelefono, correo);
 
-        busqueda.setText("");
-        telefono.setText("");
-        email.setText("");
-    } else {
-        JOptionPane.showMessageDialog(null, "No se pueden agregar más clientes.");
-    }
+       if (codigo != null) {
+           mostrarClientesEnTabla();
+
+           JOptionPane.showMessageDialog(null, "Cliente registrado.\n Nombre: "+ nombre + "\nTelefono: "+ numeroTelefono + "\nEmail :" + correo + "\nCódigo: " + codigo);
+
+           nombre1.setText("");
+           telefono.setText("");
+           email.setText("");
+       } else {
+           JOptionPane.showMessageDialog(null, "No se pueden agregar más clientes.");
+       }
+   }
     }//GEN-LAST:event_bRegistrarActionPerformed
-
-    private void busquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_busquedaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_busquedaActionPerformed
 
     private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_emailActionPerformed
 
-    private void bRegistrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bRegistrar1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_bRegistrar1ActionPerformed
-
     private void nombre1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombre1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_nombre1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void busquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_busquedaActionPerformed
 
-        /* Create and display the form */
+    }//GEN-LAST:event_busquedaActionPerformed
+
+    private void buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarActionPerformed
+        String dato = busqueda.getText().trim();
+
+        if (dato.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Ingrese un dato para buscar.");
+            return;
+        }
+
+        Cliente encontrado = persistencia.buscarCliente(dato);
+
+        if (encontrado != null) {
+
+            mnombre.setText(encontrado.getNombre());
+            mtelefono.setText(encontrado.getTelefono());
+            mcorreo.setText(encontrado.getEmail());
+            mcodigo.setText(encontrado.getCodigo());
+
+            Modificar.setEnabled(true);
+
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Cliente no encontrado.");
+
+           limpiarCamposCliente();
+
+            Modificar.setEnabled(false);
+        }
+        
+    }//GEN-LAST:event_buscarActionPerformed
+
+    private void ModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModificarActionPerformed
+        
+        if (mnombre.getText().isEmpty() ||
+            mtelefono.getText().isEmpty() ||
+            mcorreo.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(null, "Ingrese todos los campos.");
+            return;
+        }
+
+        boolean resultado = persistencia.modificarCliente(
+            mcodigo.getText(),
+            mnombre.getText(),
+            mtelefono.getText(),
+            mcorreo.getText()
+        );
+
+        if (resultado) {
+
+            mostrarClientesEnTabla();
+
+            JOptionPane.showMessageDialog(null, "Cliente modificado correctamente.");
+           limpiarCamposCliente();
+
+        } else {
+
+            JOptionPane.showMessageDialog(null, "No se pudo modificar el cliente.");
+        }
+    }//GEN-LAST:event_ModificarActionPerformed
+
+    private void eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarActionPerformed
+
+        boolean resultado = persistencia.eliminarCliente(mcodigo.getText());
+
+    if (resultado) {
+
+        mostrarClientesEnTabla();
+
+        JOptionPane.showMessageDialog(null, "Cliente eliminado correctamente.");
+
+       limpiarCamposCliente();
+
+    } else {
+        JOptionPane.showMessageDialog(null, "Busque primero un cliente.");
+    }
+
+        
+        
+        
+    }//GEN-LAST:event_eliminarActionPerformed
+
+   
+    public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> new Grafica().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Modificar;
     private javax.swing.JTabbedPane PanelContenido;
     private javax.swing.JPanel PanelPrincipal;
     private javax.swing.JButton actualizar;
     private javax.swing.JButton bRegistrar;
-    private javax.swing.JButton bRegistrar1;
+    private javax.swing.JButton buscar;
     private javax.swing.JTextField busqueda;
     private javax.swing.JButton cancha;
     private javax.swing.JPanel canchapanel;
     private javax.swing.JButton clientes;
     private javax.swing.JPanel clientespanel;
     private javax.swing.JButton disponible;
+    private javax.swing.JButton eliminar;
     private javax.swing.JTextField email;
     private javax.swing.JButton inicio;
     private javax.swing.JButton jButton1;
@@ -1198,6 +1322,10 @@ private void mostrarClientesEnTabla() {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel logo;
+    private javax.swing.JLabel mcodigo;
+    private javax.swing.JTextField mcorreo;
+    private javax.swing.JTextField mnombre;
+    private javax.swing.JTextField mtelefono;
     private javax.swing.JTextField nombre1;
     private javax.swing.JButton pagos;
     private javax.swing.JPanel pagospanel;
