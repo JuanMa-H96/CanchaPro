@@ -171,4 +171,17 @@ public class PersistenciaCancha {
         }
     }
     
+    public Cancha buscarCancha(String codigo) {
+    for (int i = 0; i < cantidadCanchas; i++) {
+        Cancha cancha = canchas[i];
+
+        if (cancha != null
+                && cancha.getCodigo().equalsIgnoreCase(codigo.trim())
+                && cancha.isActivo()) {
+            return cancha;
+        }
+    }
+
+    return null;
+}
 }
