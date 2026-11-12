@@ -1,7 +1,7 @@
 package Grafica;
+import cerebro.PersistenciaCsv;
+import Archivos.Cliente;
 
-import Datos.Clientes;
-import Logica.PersistenciaCsv;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
@@ -9,19 +9,19 @@ import javax.swing.JOptionPane;
 public class Grafica extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Grafica.class.getName());
-
+    private PersistenciaCsv persistencia = new PersistenciaCsv();
    
     public Grafica() {
         
+        
         initComponents();
+         persistencia.leerClientes();
+         mostrarClientesEnTabla();
+        
          ocultarPestanas();
-         tablaClientes.getColumnModel().getColumn(0).setPreferredWidth(50);
-         tablaClientes.getColumnModel().getColumn(1).setPreferredWidth(150);
-         tablaClientes.getColumnModel().getColumn(2).setPreferredWidth(75);
-         tablaClientes.getColumnModel().getColumn(3).setPreferredWidth   (200);
-         
-         mostrarClientes();
+    
     }
+    
     
 private void ocultarPestanas() {
     PanelContenido.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
@@ -37,27 +37,24 @@ private void ocultarPestanas() {
     });
 }
 
-private void mostrarClientes(){
-    PersistenciaCsv archivo = new PersistenciaCsv();
-    Clientes[] clientes = archivo.leerClientes();
-    
-    DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
-    modelo.setRowCount(0);
-    
-    for(int i=0; i< clientes.length; i++){
-        
-        if(clientes[i] !=null){
-            modelo.addRow(new Object[]{
-            clientes[i].getCodigo(),
-            clientes[i].getNombre(),
-              clientes[i].getTelefono(),
-                clientes[i].getemail()});
-            
-        }
-        
+private void mostrarClientesEnTabla() {
+    DefaultTableModel modelo =
+            (DefaultTableModel) tablaClientes.getModel();
+
+    modelo.setRowCount(0); // Limpia las filas actuales
+
+    for (int i = 0; i < persistencia.getCantidad(); i++) {
+        Cliente cliente = persistencia.getCliente(i);
+
+        modelo.addRow(new Object[]{
+            cliente.getCodigo(),
+            cliente.getNombre(),
+            cliente.getTelefono(),
+            cliente.getEmail()
+        });
     }
-    
 }
+
 
     
     
@@ -153,8 +150,6 @@ private void mostrarClientes(){
         PanelPrincipal.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panelmenu.setBackground(new java.awt.Color(0, 0, 51));
-
-        logo.setIcon(new javax.swing.ImageIcon("D:\\JM\\Cancha Pro\\final\\logo 1.png")); // NOI18N
 
         panelbotones.setBackground(new java.awt.Color(0, 0, 51));
         panelbotones.setLayout(new javax.swing.BoxLayout(panelbotones, javax.swing.BoxLayout.LINE_AXIS));
@@ -897,7 +892,16 @@ private void mostrarClientes(){
             new String [] {
                 "Codigo", "Nombre", "Telefono", "E-mail"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tablaClientes.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(tablaClientes);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

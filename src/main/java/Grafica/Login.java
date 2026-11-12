@@ -1,6 +1,4 @@
 package Grafica;
-import Logica.Cerebro;
-
 
 import javax.swing.SwingUtilities;
 
@@ -138,10 +136,8 @@ public class Login extends javax.swing.JFrame {
     
         String usuario=Usuario.getText();
         String clave = new String(contraseña.getPassword());
-        
-        Cerebro cerebro = new Cerebro();
-        cerebro.login(usuario, clave, this);
-        
+             
+             
     }//GEN-LAST:event_iniciarActionPerformed
   
     public static void main(String args[]) {
