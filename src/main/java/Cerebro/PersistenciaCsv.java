@@ -49,4 +49,19 @@ public class PersistenciaCsv {
         return clientes[posicion];
     }
     
+    //AGREGO NUEVO CLIENTE
+    
+public String agregarCliente(String nombre, String telefono, String email) {
+    if (cantidad >= 1000) {
+        return null;
+    }
+
+    String codigo = String.format("C%03d", cantidad + 1);
+
+    clientes[cantidad] = new Cliente(nombre, telefono, email, codigo);
+    cantidad++;
+
+    return codigo;
+}
+    
 }
