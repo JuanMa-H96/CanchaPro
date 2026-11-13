@@ -15,23 +15,34 @@ public class Disponibilidad {
         this.persistenciaReservas = persistenciaReservas;
     }
 
-   public Cancha[] buscarCanchasDisponibles(LocalDate fecha, LocalTime horaInicio, int duracionHoras, int jugadores){
-            if (jugadores <= 0) { return new Cancha[0];}
+    public Cancha[] buscarCanchasDisponibles(
+            LocalDate fecha, LocalTime horaInicio,
+            int duracionHoras, int jugadores) {
 
-        Cancha[] disponibles = new Cancha[persistenciaCanchas.getCantidadCanchas()];
+        return buscarCanchasDisponibles(
+                fecha, horaInicio, duracionHoras, jugadores, -1
+        );
+    }
+
+    public Cancha[] buscarCanchasDisponibles(
+            LocalDate fecha, LocalTime horaInicio,
+            int duracionHoras, int jugadores, int idReservaExcluir) {
+
+        Cancha[] disponibles =
+                new Cancha[persistenciaCanchas.getCantidadCanchas()];
         int cantidadDisponibles = 0;
 
         for (int i = 0; i < persistenciaCanchas.getCantidadCanchas(); i++) {
             Cancha cancha = persistenciaCanchas.getCancha(i);
 
-            if (cancha == null) {continue;}
-
-            boolean puedeUsarse = cancha.isActivo()
-                && !cancha.getEstado().equalsIgnoreCase("INACTIVA")
-                && !cancha.getEstado().equalsIgnoreCase("MANTENIMIENTO")
-                && cancha.getTipoFutbol() == jugadores
-                && cancha.getLimitePorEquipo() >= jugadores
-                && estaLibre(cancha, fecha, horaInicio, duracionHoras);
+            boolean puedeUsarse = cancha != null
+                    && cancha.isActivo()
+                    && !cancha.getEstado().equalsIgnoreCase("INACTIVA")
+                    && !cancha.getEstado().equalsIgnoreCase("MANTENIMIENTO")
+                    && cancha.getLimitePorEquipo() >= jugadores
+                    && estaLibre(
+                            cancha, fecha, horaInicio, duracionHoras, idReservaExcluir
+                    );
 
             if (puedeUsarse) {
                 disponibles[cantidadDisponibles] = cancha;
@@ -41,8 +52,11 @@ public class Disponibilidad {
 
         return disponibles;
     }
+    
+   private boolean estaLibre(
+            Cancha cancha, LocalDate fecha, LocalTime horaInicio,
+            int duracionHoras, int idReservaExcluir) {
 
-    private boolean estaLibre(Cancha cancha, LocalDate fecha, LocalTime horaInicio,int duracionHoras) {
         LocalTime horaFinal = horaInicio.plusHours(duracionHoras);
         LocalTime finConMantenimiento = horaFinal.plusMinutes(15);
 
@@ -55,22 +69,23 @@ public class Disponibilidad {
             Reserva reserva = persistenciaReservas.getReserva(i);
 
             if (reserva == null
+                    || reserva.getIdReserva() == idReservaExcluir
                     || reserva.getEstado().equalsIgnoreCase("CANCELADA")
-                    || reserva.getEstado().equalsIgnoreCase("FINALIZADA")) {
+                    || reserva.getEstado().equalsIgnoreCase("FINALIZADA")
+                    || reserva.getEstado().equalsIgnoreCase("VENCIDA")) {
                 continue;
             }
 
             boolean mismaCancha = reserva.getCancha().getCodigo()
                     .equalsIgnoreCase(cancha.getCodigo());
-
             boolean mismaFecha = reserva.getFecha().equals(fecha);
 
             if (mismaCancha && mismaFecha) {
-                LocalTime finReservaConMantenimiento =
+                LocalTime finReserva =
                         reserva.getHoraFinal().plusMinutes(15);
 
                 boolean seTraslapan =
-                        horaInicio.isBefore(finReservaConMantenimiento)
+                        horaInicio.isBefore(finReserva)
                         && reserva.getHoraInicio().isBefore(finConMantenimiento);
 
                 if (seTraslapan) {
@@ -80,5 +95,10 @@ public class Disponibilidad {
         }
 
         return true;
-    }
+    } 
+    
+    
+   
+
+
 }

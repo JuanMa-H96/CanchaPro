@@ -18,6 +18,9 @@ public class Reserva {
     private int arbitro;
     private int chalecos;
     
+    private double subtotalCancha;
+    private double totalExtras;
+    private double totalReserva;
     
 
     public Reserva(int idReserva, Cliente cliente, Cancha cancha, LocalDate fecha, LocalTime horaInicio, int duracionHoras,
@@ -148,5 +151,29 @@ public class Reserva {
         if (cantidad < 0) {
             throw new IllegalArgumentException("La cantidad no puede ser negativa.");
         }
+    }
+    
+    public double getSubtotalCancha() {
+    return subtotalCancha;
+    }
+
+    public void setSubtotalCancha(double subtotalCancha) {
+        this.subtotalCancha = subtotalCancha;
+    }
+
+    public double getTotalExtras() {
+        return totalExtras;
+    }
+
+    public void setTotalExtras(double totalExtras) {
+        this.totalExtras = totalExtras;
+    }
+
+    public double getTotalReserva() {
+        return totalReserva;
+    }
+
+    public void setTotalReserva(double totalReserva) {
+        this.totalReserva = totalReserva;
     }
 }

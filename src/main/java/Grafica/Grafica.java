@@ -2,26 +2,29 @@ package Grafica;
 
 import Archivos.Cancha;
 import Archivos.Cliente;
+import Archivos.Pago;
+import Archivos.Reserva;
+
 import Cerebro.PersistenciaClientes;
 import Cerebro.PersistenciaCancha; 
 import Cerebro.PersistenciaReservas;
 import Cerebro.Disponibilidad;
 import Cerebro.CalcularPrecio;
+import Cerebro.PersistenciaPago;
 
-
-import javax.swing.JOptionPane;
-
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import javax.swing.table.DefaultTableModel;
-
 
 import java.awt.GridLayout;
+
 import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 
 
@@ -35,53 +38,67 @@ public class Grafica extends javax.swing.JFrame {
     private Disponibilidad disponibilidad;
     
     private CalcularPrecio calculadora = new CalcularPrecio();
+    private PersistenciaPago persistenciaPagos = new PersistenciaPago();
+    private Reserva reservaSeleccionada;
+    private Reserva reservaEnEdicion = null;
     
 
     
     private Cancha canchaSelecionada;
     private Cliente clienteSelecionado;
     private double totalReserva;
-    public Grafica() {
-        
-        
-        initComponents();
-        ocultarPestanas();
-        
-        
-        //clientes
-         persistencia.leerClientes();
-         mostrarClientesEnTabla();
-        
-         //canchas
-         jScrollPane2.setViewportView(panelListaCanchas);
-        persistenciacancha.leerCanchas();
-         mostrarCanchasEnGrafica();
-         
-         //reservas 
-         persistenciaReservas = new PersistenciaReservas(persistencia,persistenciacancha);
-
-         persistenciaReservas.leerReservas();
-         persistenciaReservas.mostrarReservas(tablareserva);
-         
-         //Disponible
-         persistenciaReservas.leerReservas();
-         disponibilidad = new Disponibilidad(persistenciacancha, persistenciaReservas);
-         
-         //calcualr precios
-         pagoparcial.setEnabled(false);
-         balon.addChangeListener(e -> actualizarPrecios());
-         arbitro.addChangeListener(e -> actualizarPrecios());
-         chaleco.addChangeListener(e -> actualizarPrecios());
-         canchadisponible.addActionListener(e -> actualizarPrecios());
-         mostrarPreciosExtras();
-
+    private double subtotalCanchaActual;
+    private double totalExtrasActual;
+  
    
-         datoscliente.setEditable(false);
-            datoscliente.setLineWrap(true);
-            datoscliente.setWrapStyleWord(true);
 
-         
-    }
+    public Grafica() {
+       initComponents();
+       ocultarPestanas();
+    
+       persistenciaPagos.leerPagos();
+       
+       //clientes
+      persistencia.leerClientes();
+       mostrarClientesEnTabla();
+       
+        //canchas
+        jScrollPane2.setViewportView(panelListaCanchas);
+      persistenciacancha.leerCanchas();
+        mostrarCanchasEnGrafica();
+        
+       //reservas 
+        persistenciaReservas = new PersistenciaReservas(persistencia,persistenciacancha);
+        persistenciaReservas.leerReservas();
+        persistenciaReservas.mostrarReservas(tablareserva);
+        
+        //Disponible
+       disponibilidad = new Disponibilidad(persistenciacancha, persistenciaReservas);
+
+      //calcualr precios
+        pagoparcial.setEnabled(false);
+       balon.addChangeListener(e -> actualizarPrecios());
+        arbitro.addChangeListener(e -> actualizarPrecios());
+      chaleco.addChangeListener(e -> actualizarPrecios());
+       canchadisponible.addActionListener(e -> actualizarPrecios());
+       mostrarPreciosExtras();
+        
+        balon.setModel(new javax.swing.SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+        arbitro.setModel(new javax.swing.SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+       chaleco.setModel(new javax.swing.SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+
+       datoscliente.setEditable(false);
+        datoscliente.setLineWrap(true);
+       datoscliente.setWrapStyleWord(true);
+       
+   
+
+       setResizable(false);
+       setLocationRelativeTo(null);   
+  }    
+    
+
+ 
     
       
     
@@ -99,7 +116,7 @@ public class Grafica extends javax.swing.JFrame {
         });
     }
 
-private void mostrarClientesEnTabla() {
+    private void mostrarClientesEnTabla() {
     DefaultTableModel modelo =
             (DefaultTableModel) tablaClientes.getModel();
 
@@ -119,7 +136,7 @@ private void mostrarClientesEnTabla() {
     }
 }
 
-private void limpiarCamposCliente() {
+    private void limpiarCamposCliente() {
     busqueda.setText("");
     mnombre.setText("");
     mtelefono.setText("");
@@ -189,8 +206,6 @@ private void limpiarCamposCliente() {
     panelListaCanchas.revalidate();
     panelListaCanchas.repaint();
 }
-   
-   
     
    private void actualizarPrecios() {
     if (canchadisponible.getSelectedItem() == null) {
@@ -221,7 +236,10 @@ private void limpiarCamposCliente() {
         );
 
         double costoExtras = calculadora.calcularTotalExtras(balones, arbitros, chalecos);
-
+        
+        subtotalCanchaActual = costoCancha;
+        totalExtrasActual = costoExtras;
+        
         totalReserva = calculadora.calcularTotalReserva(costoCancha, costoExtras);
 
         // Subtotal de la reserva: cancha más extras
@@ -229,6 +247,9 @@ private void limpiarCamposCliente() {
 
         // Por ahora no hay tienda, así que el total es el mismo
         totalt.setText(String.format("Q %.2f", totalReserva));
+        
+        double anticipoMinimo = totalReserva * 0.10;
+        anticipo.setText("Anticipo 10%: Q " + String.format("%.2f", anticipoMinimo));
 }
    
    private void mostrarPreciosExtras() {
@@ -242,9 +263,181 @@ private void limpiarCamposCliente() {
             String.format("%.2f", calculadora.getPrecioChaleco()));
 }
    
+    private void actualizarCampoPagoParcial() {
+      boolean parcialSeleccionado = parcial.isSelected();
+
+      pagoparcial.setEnabled(parcialSeleccionado);
+
+      if (!parcialSeleccionado) {
+          pagoparcial.setText("");
+      }
+  }
    
+    public void cargarReservaParaModificar(Reserva reserva) {
+    if (reserva == null) {
+        JOptionPane.showMessageDialog(this, "No se encontró la reserva.");
+        return;
+    }
+
+    String estado = reserva.getEstado();
+
+    if (!estado.equalsIgnoreCase("PENDIENTE")
+            && !estado.equalsIgnoreCase("CONFIRMADA")) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Solo puedes modificar reservas pendientes o confirmadas."
+        );
+        return;
+    }
+
+    reservaEnEdicion = reserva;
+
+    // El cliente se conserva; no se modifica desde este formulario.
+    clienteSelecionado = reserva.getCliente();
+    textocliente.setText(clienteSelecionado.getCodigo());
+
+    datoscliente.setText(
+            "Código: " + clienteSelecionado.getCodigo()
+            + "\nNombre: " + clienteSelecionado.getNombre()
+            + "\nTeléfono: " + clienteSelecionado.getTelefono()
+            + "\nEmail: " + clienteSelecionado.getEmail()
+    );
+
+    // Cargar fecha, hora y duración.
+    java.util.Date fecha = java.sql.Date.valueOf(reserva.getFecha());
+    jDateChooser2.setDate(fecha);
+    timePicker2.setTime(reserva.getHoraInicio());
+    duracion.setSelectedItem(reserva.getDuracionHoras() + " Hora");
+
+    // Cargar extras.
+    balon.setValue(reserva.getBalon());
+    arbitro.setValue(reserva.getArbitro());
+    chaleco.setValue(reserva.getChalecos());
+
+    // Seleccionar la cancha por código.
+    for (int i = 0; i < canchadisponible.getItemCount(); i++) {
+        String opcion = canchadisponible.getItemAt(i);
+        if (opcion.startsWith(reserva.getCancha().getCodigo() + " - ")) {
+            canchadisponible.setSelectedIndex(i);
+            break;
+        }
+    }
+
+    // En edición no se debe registrar un pago nuevo.
+    busquedacliente.setEnabled(false);
+    textocliente.setEnabled(false);
+    cambiarControlesPago(false);
+
+    reservar.setText("Guardar cambios");
+    actualizarPrecios();
+}
+
+private void cambiarControlesPago(boolean habilitados) {
+    adelanto.setEnabled(habilitados);
+    total.setEnabled(habilitados);
+    parcial.setEnabled(habilitados);
+    pagoparcial.setEnabled(habilitados && parcial.isSelected());
+    metodopago.setEnabled(habilitados);
+}
    
-   
+    private void guardarCambiosReserva() {
+    if (reservaEnEdicion == null) {
+        JOptionPane.showMessageDialog(this, "No hay una reserva en edición.");
+        return;
+    }
+
+    if (jDateChooser2.getDate() == null
+            || timePicker2.getTime() == null
+            || duracion.getSelectedItem() == null
+            || canchadisponible.getSelectedItem() == null) {
+        JOptionPane.showMessageDialog(this, "Completa fecha, hora, duración y cancha.");
+        return;
+    }
+
+    java.time.LocalDate fecha = jDateChooser2.getDate().toInstant()
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate();
+
+    java.time.LocalTime hora = timePicker2.getTime();
+
+    int horas = Integer.parseInt(
+            duracion.getSelectedItem().toString().replaceAll("[^0-9]", "")
+    );
+
+    String seleccion = canchadisponible.getSelectedItem().toString();
+    String codigoCancha = seleccion.split(" - ")[0].trim();
+    Cancha canchaNueva = persistenciacancha.buscarCancha(codigoCancha);
+
+    if (canchaNueva == null) {
+        JOptionPane.showMessageDialog(this, "No se encontró la cancha seleccionada.");
+        return;
+    }
+
+    // Comprueba disponibilidad excluyendo la reserva que estamos editando.
+    int jugadores = Integer.parseInt(
+            numerojugadores.getSelectedItem().toString().replaceAll("[^0-9]", "")
+    );
+
+    int idExcluir = reservaEnEdicion.getIdReserva();
+
+    Cancha[] disponibles = disponibilidad.buscarCanchasDisponibles(
+            fecha, hora, horas, jugadores, idExcluir
+    );
+
+    boolean canchaDisponible = false;
+
+    for (Cancha disponible : disponibles) {
+        if (disponible == null) {
+            break;
+        }
+
+        if (disponible.getCodigo().equalsIgnoreCase(codigoCancha)) {
+            canchaDisponible = true;
+            break;
+        }
+    }
+
+    if (!canchaDisponible) {
+        JOptionPane.showMessageDialog(
+                this,
+                "La cancha no está disponible para ese horario y cantidad de jugadores."
+        );
+        return;
+    }
+
+    actualizarPrecios();
+
+    boolean modificada = persistenciaReservas.modificarReserva(
+            reservaEnEdicion.getIdReserva(),
+            canchaNueva,
+            fecha,
+            hora,
+            horas,
+            ((Number) balon.getValue()).intValue(),
+            ((Number) arbitro.getValue()).intValue(),
+            ((Number) chaleco.getValue()).intValue(),
+            subtotalCanchaActual,
+            totalExtrasActual,
+            totalReserva
+    );
+
+    if (modificada) {
+        persistenciaReservas.mostrarReservas(tablareserva);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Reserva modificada en el arreglo. Presiona Actualizar para guardar el CSV."
+        );
+
+        reservaEnEdicion = null;
+        reservar.setText("Reservar");
+    } else {
+        JOptionPane.showMessageDialog(
+                this,
+                "No se pudo modificar la reserva."
+        );
+    }
+}
     @SuppressWarnings("unchecked")  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -307,7 +500,7 @@ private void limpiarCamposCliente() {
         metodopago = new javax.swing.JComboBox<>();
         pagoparcial = new javax.swing.JTextField();
         anticipo = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        reservar = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jLabel47 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
@@ -363,6 +556,20 @@ private void limpiarCamposCliente() {
         panelreserva = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
+        menureserva1 = new javax.swing.JPanel();
+        Reservafinal = new javax.swing.JPanel();
+        jPanel18 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        codigoReserva = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        datosReserva = new javax.swing.JTextArea();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         jButton1.setText("jButton1");
 
@@ -520,11 +727,11 @@ private void limpiarCamposCliente() {
         panelinicio.setLayout(panelinicioLayout);
         panelinicioLayout.setHorizontalGroup(
             panelinicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
+            .addGap(0, 890, Short.MAX_VALUE)
         );
         panelinicioLayout.setVerticalGroup(
             panelinicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 705, Short.MAX_VALUE)
+            .addGap(0, 685, Short.MAX_VALUE)
         );
 
         PanelContenido.addTab("inicio", panelinicio);
@@ -556,10 +763,11 @@ private void limpiarCamposCliente() {
         jPanel9Layout.setHorizontalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 517, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jLabel46, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -652,15 +860,15 @@ private void limpiarCamposCliente() {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(consultar)))))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(textocliente)
@@ -679,7 +887,7 @@ private void limpiarCamposCliente() {
                             .addComponent(jLabel44)
                             .addComponent(duracion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(consultar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -703,6 +911,11 @@ private void limpiarCamposCliente() {
 
         pago.add(total);
         total.setText("Total");
+        total.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                totalActionPerformed(evt);
+            }
+        });
 
         jLabel30.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel30.setText("Pago");
@@ -770,11 +983,11 @@ private void limpiarCamposCliente() {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jarbitro, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jchaleco, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-                            .addComponent(jbalon, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jbalon, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jchaleco, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chaleco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(arbitro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -833,8 +1046,8 @@ private void limpiarCamposCliente() {
             }
         });
 
-        anticipo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         anticipo.setText("Anticipo");
+        anticipo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
@@ -882,11 +1095,11 @@ private void limpiarCamposCliente() {
                 .addContainerGap())
         );
 
-        jButton2.setText("Reservar");
-        jButton2.setFont(new java.awt.Font("Segoe UI", 2, 24)); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        reservar.setText("Reservar");
+        reservar.setFont(new java.awt.Font("Segoe UI", 2, 24)); // NOI18N
+        reservar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                reservarActionPerformed(evt);
             }
         });
 
@@ -909,8 +1122,8 @@ private void limpiarCamposCliente() {
                                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(60, 60, 60)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(25, Short.MAX_VALUE))
+                        .addComponent(reservar, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -924,7 +1137,7 @@ private void limpiarCamposCliente() {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(reservar, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -1081,20 +1294,19 @@ private void limpiarCamposCliente() {
         canchapanel.setLayout(canchapanelLayout);
         canchapanelLayout.setHorizontalGroup(
             canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, canchapanelLayout.createSequentialGroup()
+            .addGroup(canchapanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, canchapanelLayout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(canchapanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 768, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(45, 45, 45))
+                .addGroup(canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(canchapanelLayout.createSequentialGroup()
+                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
         canchapanelLayout.setVerticalGroup(
             canchapanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1110,7 +1322,7 @@ private void limpiarCamposCliente() {
                         .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         PanelContenido.addTab("reserva", canchapanel);
@@ -1122,7 +1334,7 @@ private void limpiarCamposCliente() {
         clientespanelLayout.setHorizontalGroup(
             clientespanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, clientespanelLayout.createSequentialGroup()
-                .addContainerGap(731, Short.MAX_VALUE)
+                .addContainerGap(811, Short.MAX_VALUE)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42))
         );
@@ -1131,7 +1343,7 @@ private void limpiarCamposCliente() {
             .addGroup(clientespanelLayout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addComponent(jLabel5)
-                .addContainerGap(668, Short.MAX_VALUE))
+                .addContainerGap(648, Short.MAX_VALUE))
         );
 
         PanelContenido.addTab("disponiblidad", clientespanel);
@@ -1144,7 +1356,7 @@ private void limpiarCamposCliente() {
         panelListaCanchas.setLayout(panelListaCanchasLayout);
         panelListaCanchasLayout.setHorizontalGroup(
             panelListaCanchasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 778, Short.MAX_VALUE)
+            .addGap(0, 854, Short.MAX_VALUE)
         );
         panelListaCanchasLayout.setVerticalGroup(
             panelListaCanchasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1170,7 +1382,7 @@ private void limpiarCamposCliente() {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 786, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 866, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel62, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -1188,7 +1400,7 @@ private void limpiarCamposCliente() {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nuevachancha, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout pagospanelLayout = new javax.swing.GroupLayout(pagospanel);
@@ -1297,7 +1509,7 @@ private void limpiarCamposCliente() {
                 .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(bRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(207, Short.MAX_VALUE))
+                .addContainerGap(194, Short.MAX_VALUE))
             .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel13Layout.createSequentialGroup()
                     .addGap(120, 120, 120)
@@ -1474,7 +1686,7 @@ private void limpiarCamposCliente() {
                         .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelclientesLayout.setVerticalGroup(
             panelclientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1498,11 +1710,11 @@ private void limpiarCamposCliente() {
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
+            .addGap(0, 890, Short.MAX_VALUE)
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 705, Short.MAX_VALUE)
+            .addGap(0, 685, Short.MAX_VALUE)
         );
 
         PanelContenido.addTab("reportes", jPanel11);
@@ -1511,24 +1723,182 @@ private void limpiarCamposCliente() {
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 810, Short.MAX_VALUE)
+            .addGap(0, 890, Short.MAX_VALUE)
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 705, Short.MAX_VALUE)
+            .addGap(0, 685, Short.MAX_VALUE)
         );
 
         PanelContenido.addTab("tienda", jPanel12);
 
-        PanelPrincipal.add(PanelContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 810, 740));
+        jPanel18.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Buscar Reserva");
+
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("Ingrese Codigo de Reserva ");
+
+        codigoReserva.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        codigoReserva.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jButton2.setText("Buscar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        datosReserva.setColumns(20);
+        datosReserva.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        datosReserva.setRows(5);
+        jScrollPane5.setViewportView(datosReserva);
+
+        jButton3.setText("Modificar");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Cancelar");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel18Layout = new javax.swing.GroupLayout(jPanel18);
+        jPanel18.setLayout(jPanel18Layout);
+        jPanel18Layout.setHorizontalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel18Layout.createSequentialGroup()
+                .addGroup(jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel18Layout.createSequentialGroup()
+                        .addGap(93, 93, 93)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel18Layout.createSequentialGroup()
+                        .addGap(64, 64, 64)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel18Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane5)
+                            .addGroup(jPanel18Layout.createSequentialGroup()
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(codigoReserva))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel18Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(125, 125, 125))
+        );
+        jPanel18Layout.setVerticalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel18Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(codigoReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(10, Short.MAX_VALUE))
+        );
+
+        jButton5.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jButton5.setText("Nueva Reserva");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jButton6.setText("Ver Reservas");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Control Reservas");
+
+        javax.swing.GroupLayout ReservafinalLayout = new javax.swing.GroupLayout(Reservafinal);
+        Reservafinal.setLayout(ReservafinalLayout);
+        ReservafinalLayout.setHorizontalGroup(
+            ReservafinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ReservafinalLayout.createSequentialGroup()
+                .addGroup(ReservafinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(ReservafinalLayout.createSequentialGroup()
+                        .addGap(84, 84, 84)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(202, 202, 202)
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(ReservafinalLayout.createSequentialGroup()
+                        .addGap(179, 179, 179)
+                        .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(ReservafinalLayout.createSequentialGroup()
+                        .addGap(235, 235, 235)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(236, Short.MAX_VALUE))
+        );
+        ReservafinalLayout.setVerticalGroup(
+            ReservafinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ReservafinalLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(jLabel2)
+                .addGap(56, 56, 56)
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(ReservafinalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(65, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout menureserva1Layout = new javax.swing.GroupLayout(menureserva1);
+        menureserva1.setLayout(menureserva1Layout);
+        menureserva1Layout.setHorizontalGroup(
+            menureserva1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(menureserva1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Reservafinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        menureserva1Layout.setVerticalGroup(
+            menureserva1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(menureserva1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Reservafinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        PanelContenido.addTab("tab9", menureserva1);
+
+        PanelPrincipal.add(PanelContenido, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 890, 720));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(PanelPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(PanelPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, 996, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 6, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1543,7 +1913,7 @@ private void limpiarCamposCliente() {
         PanelContenido.setSelectedIndex(0);
     }//GEN-LAST:event_inicioActionPerformed
     private void reservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservaActionPerformed
-        PanelContenido.setSelectedIndex(1);
+         PanelContenido.setSelectedIndex(8);
     }//GEN-LAST:event_reservaActionPerformed
     private void disponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disponibleActionPerformed
         PanelContenido.setSelectedIndex(2);
@@ -1766,7 +2136,11 @@ private void limpiarCamposCliente() {
     );
 
     // Buscar canchas que cumplan capacidad y disponibilidad horaria
-    Archivos.Cancha[] disponibles = disponibilidad.buscarCanchasDisponibles(fecha, horaInicio, duracionHoras, jugadores);
+    int idExcluir = (reservaEnEdicion == null)
+        ? -1
+        : reservaEnEdicion.getIdReserva();
+
+    Cancha[] disponibles = disponibilidad.buscarCanchasDisponibles(fecha,horaInicio,duracionHoras,jugadores,idExcluir);
 
     // Limpiar y llenar el combo de canchas disponibles
     javax.swing.DefaultComboBoxModel<String> modelo =
@@ -1783,20 +2157,27 @@ private void limpiarCamposCliente() {
     }
 
     canchadisponible.setModel(modelo);
-    if (modelo.getSize() > 0) {
-    actualizarPrecios();
-    }
 
     if (modelo.getSize() == 0) {
+        subtotal.setText("Q 0.00");
+        totalt.setText("Q 0.00");
+        anticipo.setText("Anticipo 10%: Q 0.00");
+
         JOptionPane.showMessageDialog(
                 this,
-                "No hay canchas disponibles con esa capacidad y horario."
+                "No hay canchas disponibles."
         );
+        return;
     }
+
+    canchadisponible.setSelectedIndex(0);
+    actualizarPrecios();
     }//GEN-LAST:event_consultarActionPerformed
 
     private void adelantoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adelantoActionPerformed
-        // TODO add your handling code here:
+    
+    actualizarCampoPagoParcial();
+
     }//GEN-LAST:event_adelantoActionPerformed
 
     private void canchadisponibleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canchadisponibleActionPerformed
@@ -1807,21 +2188,316 @@ private void limpiarCamposCliente() {
         // TODO add your handling code here:
     }//GEN-LAST:event_metodopagoActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void reservarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservarActionPerformed
+        
+    if (reservaEnEdicion != null) {
+        guardarCambiosReserva();
+        return;
+    }
+
+    
+      
+    if (clienteSelecionado == null) {
+        JOptionPane.showMessageDialog(this, "Primero selecciona un cliente.");
+        return;
+    }
+
+    if (jDateChooser2.getDate() == null
+            || timePicker2.getTime() == null
+            || duracion.getSelectedItem() == null
+            || canchadisponible.getSelectedItem() == null) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Completa cliente, fecha, hora, duración y cancha."
+        );
+        return;
+    }
+
+    // Debe estar seleccionada exactamente una opción de pago.
+    int opcionesPago = 0;
+    if (adelanto.isSelected()) opcionesPago++;
+    if (total.isSelected()) opcionesPago++;
+    if (parcial.isSelected()) opcionesPago++;
+
+    if (opcionesPago != 1) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Selecciona solo una opción de pago."
+        );
+        return;
+    }
+
+    Object metodoSeleccionado = metodopago.getSelectedItem();
+
+    if (metodoSeleccionado == null
+            || metodoSeleccionado.toString().trim().equals(".")
+            || metodoSeleccionado.toString().trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Selecciona un método de pago.");
+        return;
+    }
+    String metodo = metodoSeleccionado.toString();
+
+    // Actualiza el total con la cancha y los extras actuales.
+    actualizarPrecios();
+
+    double anticipoMinimo =
+            Math.round(totalReserva * 0.10 * 100.0) / 100.0;
+
+    double montoPago;
+
+    if (adelanto.isSelected()) {
+        montoPago = anticipoMinimo;
+
+    } else if (total.isSelected()) {
+        montoPago = totalReserva;
+
+    } else {
+        try {
+            montoPago = Double.parseDouble(
+                    pagoparcial.getText().trim().replace(",", ".")
+            );
+        } catch (NumberFormatException e) {JOptionPane.showMessageDialog(this,"Ingresa una cantidad válida.");
+            return;
+        }
+
+        if (montoPago <= anticipoMinimo || montoPago >= totalReserva) {
+            JOptionPane.showMessageDialog(this,"El pago parcial debe ser mayor al anticipo y menor al total.");
+            return;
+        }
+    }
+
+    String seleccionCancha =
+            canchadisponible.getSelectedItem().toString();
+    String codigoCancha = seleccionCancha.split(" - ")[0].trim();
+
+    canchaSelecionada =
+            persistenciacancha.buscarCancha(codigoCancha);
+
+    if (canchaSelecionada == null) {
+        JOptionPane.showMessageDialog(this, "No se encontró la cancha.");
+        return;
+    }
+
+    java.time.LocalDate fecha = jDateChooser2.getDate().toInstant()
+            .atZone(java.time.ZoneId.systemDefault())
+            .toLocalDate();
+
+    java.time.LocalTime hora = timePicker2.getTime();
+
+    int horas = Integer.parseInt(
+            duracion.getSelectedItem().toString().replaceAll("[^0-9]", "")
+    );
+
+    int idReserva = persistenciaReservas.generarSiguienteId();
+
+    Reserva reserva = new Reserva(
+            idReserva,
+            clienteSelecionado,
+            canchaSelecionada,
+            fecha,
+            hora,
+            horas,
+            ((Number) balon.getValue()).intValue(),
+            ((Number) arbitro.getValue()).intValue(),
+            ((Number) chaleco.getValue()).intValue()
+    );
+
+    reserva.setEstado("CONFIRMADA");
+    reserva.setSubtotalCancha(subtotalCanchaActual);
+    reserva.setTotalExtras(totalExtrasActual);
+    reserva.setTotalReserva(totalReserva);
+
+    if (!persistenciaReservas.agregarReserva(reserva)) {
+        JOptionPane.showMessageDialog(
+                this,
+                "No se pudo guardar la reserva."
+        );
+        return;
+    }
+
+    Pago pagoInicial = new Pago(
+            "P" + System.currentTimeMillis(),
+            idReserva,
+            LocalDateTime.now(),
+            montoPago,
+            metodo
+    );
+
+    if (!persistenciaPagos.agregarPago(pagoInicial)) {
+        JOptionPane.showMessageDialog(
+                this,
+                "No hay espacio para agregar el pago."
+        );
+        return;
+    }
+
+    persistenciaReservas.mostrarReservas(tablareserva);
+
+   double saldoPendiente = totalReserva - montoPago;
+
+    String mensaje =
+            "Reserva: R" + String.format("%03d", reserva.getIdReserva()) + "\n"
+            + "Cliente: " + reserva.getCliente().getNombre() + "\n"
+            + "Cancha: " + reserva.getCancha().getNombre() + "\n"
+            + "Fecha: " + reserva.getFecha() + "\n"
+            + "Horario: " + reserva.getHoraInicio()
+            + " - " + reserva.getHoraFinal() + "\n"
+            + "Duración: " + reserva.getDuracionHoras() + " hora(s)\n\n"
+            + "Balones: " + reserva.getBalon() + "\n"
+            + "Árbitros: " + reserva.getArbitro() + "\n"
+            + "Chalecos: " + reserva.getChalecos() + "\n\n"
+            + "Total: Q " + String.format("%.2f", totalReserva) + "\n"
+            + "Pagado: Q " + String.format("%.2f", montoPago) + "\n"
+            + "Pendiente: Q " + String.format("%.2f", saldoPendiente);
+
+    JOptionPane.showMessageDialog(
+            this,
+            mensaje,
+            "Reserva realizada",
+            JOptionPane.INFORMATION_MESSAGE
+    );
+
+        
+        
+        
+        
+        
+        
+    }//GEN-LAST:event_reservarActionPerformed
 
     private void pagoparcialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagoparcialActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_pagoparcialActionPerformed
 
     private void parcialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parcialActionPerformed
-          pagoparcial.setEnabled(parcial.isSelected());
-
-    if (!parcial.isSelected()) {
-        pagoparcial.setText("");
-    }
+      actualizarCampoPagoParcial();
+    
     }//GEN-LAST:event_parcialActionPerformed
+
+    private void totalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalActionPerformed
+        actualizarCampoPagoParcial();
+    }//GEN-LAST:event_totalActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+         PanelContenido.setSelectedIndex(1);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+       Reservas ventana = new Reservas(persistenciaReservas, persistenciaPagos);
+ventana.setLocationRelativeTo(this);
+ventana.setVisible(true);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+
+    String codigo = codigoReserva.getText().trim().toUpperCase();
+
+    if (!codigo.startsWith("R")) {
+        JOptionPane.showMessageDialog(this, "Escribe el código, por ejemplo R001.");
+        return;
+    }
+
+    try {
+        int id = Integer.parseInt(codigo.substring(1));
+        reservaSeleccionada = persistenciaReservas.buscarReserva(id);
+
+        if (reservaSeleccionada == null) {
+            datosReserva.setText("No se encontró la reserva " + codigo);
+            return;
+        }
+
+        datosReserva.setText(
+                "Código: R" + String.format("%03d", reservaSeleccionada.getIdReserva())
+                + "\nCliente: " + reservaSeleccionada.getCliente().getNombre()
+                + "\nCancha: " + reservaSeleccionada.getCancha().getNombre()
+                + "\nFecha: " + reservaSeleccionada.getFecha()
+                + "\nHorario: " + reservaSeleccionada.getHoraInicio()
+                + " - " + reservaSeleccionada.getHoraFinal()
+                + "\nDuración: " + reservaSeleccionada.getDuracionHoras() + " hora(s)"
+                + "\nEstado: " + reservaSeleccionada.getEstado()
+                + "\nBalones: " + reservaSeleccionada.getBalon()
+                + "\nÁrbitros: " + reservaSeleccionada.getArbitro()
+                + "\nChalecos: " + reservaSeleccionada.getChalecos()
+                + "\nTotal: Q" + String.format("%.2f", reservaSeleccionada.getTotalReserva())
+        );
+
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "El código debe tener formato R001.");
+    }
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+
+    if (reservaSeleccionada == null) {
+        JOptionPane.showMessageDialog(this, "Primero busca una reserva.");
+        return;
+    }
+
+    String estado = reservaSeleccionada.getEstado();
+
+    if (estado.equalsIgnoreCase("FINALIZADA")
+            || estado.equalsIgnoreCase("VENCIDA")
+            || estado.equalsIgnoreCase("CANCELADA")) {
+        JOptionPane.showMessageDialog(
+                this,
+                "No se puede Cancelar una reserva que ya sido " + estado + "."
+        );
+        return;
+    }
+
+    int respuesta = JOptionPane.showConfirmDialog(
+            this,
+            "¿Deseas cancelar la reserva R"
+                    + String.format("%03d", reservaSeleccionada.getIdReserva())
+                    + "?",
+            "Confirmar cancelación",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (respuesta == JOptionPane.YES_OPTION) {
+        int id = reservaSeleccionada.getIdReserva();
+        boolean cancelada = persistenciaReservas.cancelarReserva(id);
+
+        if (cancelada) {
+            reservaSeleccionada = persistenciaReservas.buscarReserva(id);
+            datosReserva.setText("Estado: CANCELADA");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Reserva cancelada."
+            );
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudo cancelar la reserva."
+            );
+        }
+    }
+
+
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (reservaSeleccionada == null) {
+        JOptionPane.showMessageDialog(this, "Primero busca una reserva.");
+        return;
+    }
+
+    String estado = reservaSeleccionada.getEstado();
+
+    if (!estado.equalsIgnoreCase("PENDIENTE")
+            && !estado.equalsIgnoreCase("CONFIRMADA")) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Solo puedes modificar reservas pendientes o confirmadas."
+        );
+        return;
+    }
+
+    cargarReservaParaModificar(reservaSeleccionada);
+    PanelContenido.setSelectedIndex(1);
+    }//GEN-LAST:event_jButton3ActionPerformed
 
    
 
@@ -1829,6 +2505,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JButton Modificar;
     private javax.swing.JTabbedPane PanelContenido;
     private javax.swing.JPanel PanelPrincipal;
+    private javax.swing.JPanel Reservafinal;
     private javax.swing.JButton actualizar;
     private javax.swing.JCheckBox adelanto;
     private javax.swing.JLabel anticipo;
@@ -1844,7 +2521,9 @@ private void limpiarCamposCliente() {
     private javax.swing.JSpinner chaleco;
     private javax.swing.JButton clientes;
     private javax.swing.JPanel clientespanel;
+    private javax.swing.JTextField codigoReserva;
     private javax.swing.JButton consultar;
+    private javax.swing.JTextArea datosReserva;
     private javax.swing.JTextArea datoscliente;
     private javax.swing.JButton disponible;
     private javax.swing.JComboBox<String> duracion;
@@ -1853,11 +2532,17 @@ private void limpiarCamposCliente() {
     private javax.swing.JButton inicio;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private com.toedter.calendar.JDateChooser jDateChooser2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
@@ -1867,6 +2552,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
@@ -1888,6 +2574,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1900,6 +2587,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSpinner jSpinner4;
     private javax.swing.JSpinner jSpinner5;
     private javax.swing.JSpinner jSpinner6;
@@ -1913,6 +2601,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JLabel logo;
     private javax.swing.JLabel mcodigo;
     private javax.swing.JTextField mcorreo;
+    private javax.swing.JPanel menureserva1;
     private javax.swing.JComboBox<String> metodopago;
     private javax.swing.JTextField mnombre;
     private javax.swing.JTextField mtelefono;
@@ -1932,6 +2621,7 @@ private void limpiarCamposCliente() {
     private javax.swing.JCheckBox parcial;
     private javax.swing.JButton reportes;
     private javax.swing.JButton reserva;
+    private javax.swing.JButton reservar;
     private javax.swing.JLabel subtotal;
     private javax.swing.JTable tablaClientes;
     private javax.swing.JTable tablareserva;

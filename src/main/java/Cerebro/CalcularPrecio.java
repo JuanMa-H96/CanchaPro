@@ -8,7 +8,7 @@ import java.time.LocalTime;
 public class CalcularPrecio {
 
     private double NocheSemana = 0.25;
-    private double FinSemanaDia = 0.20;
+    private double FinSemanaDia = 0.50;
     private double SemanaNoche = 0.75;
 
     private double precioBalon = 25.00;
