@@ -95,13 +95,13 @@ private void colorearFilasPorEstado() {
 
         todasreservas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Reserva", "Cliente", "Cancha", "Fecha", "Horario", "Duracion", "Estado", "Balones", "Arbitros", "Chalecos", "Total Q", "Pagado Q", "Pendiente Q"
+                "Reserva", "Cliente", "Cancha", "Fecha", "Horario", "Duracion", "Estado", "Balones", "Arbitros", "Chalecos", "Total Q", "Pagado Q", "Pendiente Q", "Fecha Cancelacion", "Usuario", "Motivo"
             }
         ));
         jScrollPane6.setViewportView(todasreservas);

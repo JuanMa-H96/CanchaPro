@@ -1,6 +1,7 @@
 package Archivos;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Reserva {
@@ -17,18 +18,35 @@ public class Reserva {
     private int balon;
     private int arbitro;
     private int chalecos;
-    
+
     private double subtotalCancha;
     private double totalExtras;
     private double totalReserva;
-    
 
-    public Reserva(int idReserva, Cliente cliente, Cancha cancha, LocalDate fecha, LocalTime horaInicio, int duracionHoras,
-            int balon, int arbitro, int chalecos){
-       
+    private LocalDateTime fechaCancelacion;
+    private String motivoCancelacion;
+    private String usuarioResponsableCancelacion;
+
+    public Reserva(
+            int idReserva,
+            Cliente cliente,
+            Cancha cancha,
+            LocalDate fecha,
+            LocalTime horaInicio,
+            int duracionHoras,
+            int balon,
+            int arbitro,
+            int chalecos) {
+
         validarCantidad(balon);
         validarCantidad(arbitro);
         validarCantidad(chalecos);
+
+        if (duracionHoras <= 0) {
+            throw new IllegalArgumentException(
+                    "La duración debe ser mayor que cero."
+            );
+        }
 
         this.idReserva = idReserva;
         this.cliente = cliente;
@@ -42,6 +60,10 @@ public class Reserva {
         this.balon = balon;
         this.arbitro = arbitro;
         this.chalecos = chalecos;
+
+        this.fechaCancelacion = null;
+        this.motivoCancelacion = "";
+        this.usuarioResponsableCancelacion = "";
     }
 
     public int getIdReserva() {
@@ -88,6 +110,30 @@ public class Reserva {
         return chalecos;
     }
 
+    public double getSubtotalCancha() {
+        return subtotalCancha;
+    }
+
+    public double getTotalExtras() {
+        return totalExtras;
+    }
+
+    public double getTotalReserva() {
+        return totalReserva;
+    }
+
+    public LocalDateTime getFechaCancelacion() {
+        return fechaCancelacion;
+    }
+
+    public String getMotivoCancelacion() {
+        return motivoCancelacion;
+    }
+
+    public String getUsuarioResponsableCancelacion() {
+        return usuarioResponsableCancelacion;
+    }
+
     public void setIdReserva(int idReserva) {
         this.idReserva = idReserva;
     }
@@ -111,7 +157,9 @@ public class Reserva {
 
     public void setDuracionHoras(int duracionHoras) {
         if (duracionHoras <= 0) {
-            throw new IllegalArgumentException("La duración debe ser mayor que cero.");
+            throw new IllegalArgumentException(
+                    "La duración debe ser mayor que cero."
+            );
         }
 
         this.duracionHoras = duracionHoras;
@@ -137,8 +185,49 @@ public class Reserva {
         this.chalecos = chalecos;
     }
 
-    public void cancelar() {
-        estado = "CANCELADA";
+    public void setSubtotalCancha(double subtotalCancha) {
+        this.subtotalCancha = subtotalCancha;
+    }
+
+    public void setTotalExtras(double totalExtras) {
+        this.totalExtras = totalExtras;
+    }
+
+    public void setTotalReserva(double totalReserva) {
+        this.totalReserva = totalReserva;
+    }
+
+    public void setFechaCancelacion(LocalDateTime fechaCancelacion) {
+        this.fechaCancelacion = fechaCancelacion;
+    }
+
+    public void setMotivoCancelacion(String motivoCancelacion) {
+        this.motivoCancelacion = motivoCancelacion;
+    }
+
+    public void setUsuarioResponsableCancelacion(
+            String usuarioResponsableCancelacion) {
+        this.usuarioResponsableCancelacion = usuarioResponsableCancelacion;
+    }
+
+    public void cancelar(String motivo, String usuarioResponsable) {
+        if (motivo == null || motivo.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Debes indicar el motivo de la cancelación."
+            );
+        }
+
+        if (usuarioResponsable == null
+                || usuarioResponsable.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Debes indicar el usuario responsable."
+            );
+        }
+
+        this.estado = "CANCELADA";
+        this.fechaCancelacion = LocalDateTime.now();
+        this.motivoCancelacion = motivo.trim();
+        this.usuarioResponsableCancelacion = usuarioResponsable.trim();
     }
 
     private void actualizarHoraFinal() {
@@ -149,31 +238,9 @@ public class Reserva {
 
     private void validarCantidad(int cantidad) {
         if (cantidad < 0) {
-            throw new IllegalArgumentException("La cantidad no puede ser negativa.");
+            throw new IllegalArgumentException(
+                    "La cantidad no puede ser negativa."
+            );
         }
-    }
-    
-    public double getSubtotalCancha() {
-    return subtotalCancha;
-    }
-
-    public void setSubtotalCancha(double subtotalCancha) {
-        this.subtotalCancha = subtotalCancha;
-    }
-
-    public double getTotalExtras() {
-        return totalExtras;
-    }
-
-    public void setTotalExtras(double totalExtras) {
-        this.totalExtras = totalExtras;
-    }
-
-    public double getTotalReserva() {
-        return totalReserva;
-    }
-
-    public void setTotalReserva(double totalReserva) {
-        this.totalReserva = totalReserva;
     }
 }

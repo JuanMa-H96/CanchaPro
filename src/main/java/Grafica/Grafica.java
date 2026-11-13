@@ -91,6 +91,12 @@ public class Grafica extends javax.swing.JFrame {
         datoscliente.setLineWrap(true);
        datoscliente.setWrapStyleWord(true);
        
+       metodopago.setEnabled(false);
+
+        adelanto.addActionListener(e -> actualizarMetodoPago());
+        total.addActionListener(e -> actualizarMetodoPago());
+        parcial.addActionListener(e -> actualizarMetodoPago());
+       
    
 
        setResizable(false);
@@ -332,7 +338,7 @@ public class Grafica extends javax.swing.JFrame {
     actualizarPrecios();
 }
 
-private void cambiarControlesPago(boolean habilitados) {
+    private void cambiarControlesPago(boolean habilitados) {
     adelanto.setEnabled(habilitados);
     total.setEnabled(habilitados);
     parcial.setEnabled(habilitados);
@@ -340,7 +346,63 @@ private void cambiarControlesPago(boolean habilitados) {
     metodopago.setEnabled(habilitados);
 }
    
+    private void actualizarMetodoPago() {
+        boolean hayPagoSeleccionado =
+                adelanto.isSelected()
+                || total.isSelected()
+                || parcial.isSelected();
+
+        metodopago.setEnabled(hayPagoSeleccionado);
+
+        if (hayPagoSeleccionado) {
+            metodopago.requestFocus();
+        } else {
+            metodopago.setSelectedIndex(0); // Debe ser la opción inicial, por ejemplo "."
+        }
+    }
+    
+    private void limpiarFormularioReserva() {
+    reservaEnEdicion = null;
+    clienteSelecionado = null;
+
+    textocliente.setText("");
+    textocliente.setEnabled(true);
+    busquedacliente.setEnabled(true);
+    datoscliente.setText("");
+
+    jDateChooser2.setDate(null);
+    timePicker2.setTime(null);
+
+    numerojugadores.setSelectedIndex(0);
+    duracion.setSelectedIndex(0);
+    canchadisponible.removeAllItems();
+
+    balon.setValue(0);
+    arbitro.setValue(0);
+    chaleco.setValue(0);
+
+    pago.clearSelection();
+    actualizarMetodoPago();
+
+    pagoparcial.setText("");
+    pagoparcial.setEnabled(false);
+
+    metodopago.setSelectedIndex(0);
+    metodopago.setEnabled(false);
+
+    subtotal.setText("Q 0.00");
+    totalt.setText("Q 0.00");
+    anticipo.setText("Anticipo 10%: Q 0.00");
+
+    reservar.setText("Reservar");
+}
+      
     private void guardarCambiosReserva() {
+        
+        if (!validarFechaYHora()) {
+            return;
+        }
+        
     if (reservaEnEdicion == null) {
         JOptionPane.showMessageDialog(this, "No hay una reserva en edición.");
         return;
@@ -422,22 +484,84 @@ private void cambiarControlesPago(boolean habilitados) {
     );
 
     if (modificada) {
-        persistenciaReservas.mostrarReservas(tablareserva);
+     int cotizacionesVencidas = 0;
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Reserva modificada"
-        );
+        if (reservaEnEdicion.getEstado().equalsIgnoreCase("CONFIRMADA")) {
+            cotizacionesVencidas =
+                    persistenciaReservas.vencerCotizacionesEnConflicto(
+                            canchaNueva.getCodigo(),
+                            fecha,
+                            hora,
+                            horas
+                    );
+        }
+          
+     persistenciaReservas.mostrarReservas(tablareserva);
 
-        reservaEnEdicion = null;
-        reservar.setText("Reservar");
-    } else {
-        JOptionPane.showMessageDialog(
-                this,
-                "No se pudo modificar la reserva."
-        );
-    }
+     // El objeto ya fue actualizado por PersistenciaReservas.
+     String mensaje =
+             "Reserva modificada: R"
+             + String.format("%03d", reservaEnEdicion.getIdReserva())
+             + "\nCliente: " + reservaEnEdicion.getCliente().getNombre()
+             + "\nCancha: " + reservaEnEdicion.getCancha().getNombre()
+             + "\nFecha: " + reservaEnEdicion.getFecha()
+             + "\nHorario: " + reservaEnEdicion.getHoraInicio()
+             + " - " + reservaEnEdicion.getHoraFinal()
+             + "\nDuración: " + reservaEnEdicion.getDuracionHoras() + " hora(s)"
+             + "\nTotal: Q "
+             + String.format("%.2f", reservaEnEdicion.getTotalReserva());
+
+     JOptionPane.showMessageDialog(
+             this,
+             mensaje,
+             "Reserva modificada",
+             JOptionPane.INFORMATION_MESSAGE
+     );
+
+        
+            limpiarFormularioReserva();
+
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudo modificar la reserva."
+            );
+        } 
 }
+    
+    private boolean validarFechaYHora() {
+        if (jDateChooser2.getDate() == null || timePicker2.getTime() == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona una fecha y una hora.");
+            return false;
+        }
+
+        java.time.LocalDate fecha = jDateChooser2.getDate().toInstant()
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate();
+
+        java.time.LocalTime hora = timePicker2.getTime();
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+
+        if (fecha.isBefore(hoy)) {
+            JOptionPane.showMessageDialog(this, "No puedes seleccionar una fecha pasada.");
+            return false;
+        }
+
+        if (fecha.equals(hoy) && hora.isBefore(java.time.LocalTime.now())) {
+            JOptionPane.showMessageDialog(this, "La hora seleccionada ya pasó.");
+            return false;
+        }
+
+        return true;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     @SuppressWarnings("unchecked")  
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -566,7 +690,7 @@ private void cambiarControlesPago(boolean habilitados) {
         jScrollPane5 = new javax.swing.JScrollPane();
         datosReserva = new javax.swing.JTextArea();
         jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btcancelar = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -1744,8 +1868,8 @@ private void cambiarControlesPago(boolean habilitados) {
         codigoReserva.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         codigoReserva.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton2.setText("Buscar");
+        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -1764,10 +1888,10 @@ private void cambiarControlesPago(boolean habilitados) {
             }
         });
 
-        jButton4.setText("Cancelar");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btcancelar.setText("Cancelar");
+        btcancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btcancelarActionPerformed(evt);
             }
         });
 
@@ -1790,7 +1914,7 @@ private void cambiarControlesPago(boolean habilitados) {
                             .addGroup(jPanel18Layout.createSequentialGroup()
                                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btcancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(codigoReserva))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel18Layout.createSequentialGroup()
@@ -1814,7 +1938,7 @@ private void cambiarControlesPago(boolean habilitados) {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btcancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(10, Short.MAX_VALUE))
         );
 
@@ -2106,6 +2230,10 @@ private void cambiarControlesPago(boolean habilitados) {
     }//GEN-LAST:event_busquedaclienteActionPerformed
 
     private void consultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultarActionPerformed
+        if (!validarFechaYHora()) {
+            return;
+        }
+
         if (clienteSelecionado == null) {
         JOptionPane.showMessageDialog(this, "Primero busca o registra un cliente.\n\nIngresa Carnet, Nombre o Telefono");return;
     }
@@ -2189,6 +2317,10 @@ private void cambiarControlesPago(boolean habilitados) {
     }//GEN-LAST:event_metodopagoActionPerformed
 
     private void reservarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservarActionPerformed
+     
+        if (!validarFechaYHora()) {
+            return;
+        }
         
     if (reservaEnEdicion != null) {
         guardarCambiosReserva();
@@ -2213,59 +2345,75 @@ private void cambiarControlesPago(boolean habilitados) {
         return;
     }
 
-    // Debe estar seleccionada exactamente una opción de pago.
+   // Pago
     int opcionesPago = 0;
+
     if (adelanto.isSelected()) opcionesPago++;
     if (total.isSelected()) opcionesPago++;
     if (parcial.isSelected()) opcionesPago++;
 
-    if (opcionesPago != 1) {
+    if (opcionesPago > 1) {
         JOptionPane.showMessageDialog(
                 this,
-                "Selecciona solo una opción de pago."
+                "Selecciona solo una opción de pago, o ninguna para guardar una cotización."
         );
         return;
     }
 
-    Object metodoSeleccionado = metodopago.getSelectedItem();
+    String metodo = "";
 
-    if (metodoSeleccionado == null
-            || metodoSeleccionado.toString().trim().equals(".")
-            || metodoSeleccionado.toString().trim().isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Selecciona un método de pago.");
-        return;
-    }
-    String metodo = metodoSeleccionado.toString();
+        if (opcionesPago == 1) {
+            Object metodoSeleccionado = metodopago.getSelectedItem();
+
+            if (metodoSeleccionado == null
+                    || metodoSeleccionado.toString().trim().equals(".")
+                    || metodoSeleccionado.toString().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Selecciona un método de pago.");
+                return;
+            }
+
+            metodo = metodoSeleccionado.toString().trim();
+        }
 
     // Actualiza el total con la cancha y los extras actuales.
     actualizarPrecios();
 
-    double anticipoMinimo =
-            Math.round(totalReserva * 0.10 * 100.0) / 100.0;
 
-    double montoPago;
 
-    if (adelanto.isSelected()) {
-        montoPago = anticipoMinimo;
+    double montoPago = 0;
+    double anticipoMinimo = Math.round(totalReserva * 0.10 * 100.0) / 100.0;
 
-    } else if (total.isSelected()) {
-        montoPago = totalReserva;
+    if (opcionesPago == 1) {
+        if (adelanto.isSelected()) {
+            montoPago = anticipoMinimo;
 
-    } else {
-        try {
-            montoPago = Double.parseDouble(
-                    pagoparcial.getText().trim().replace(",", ".")
-            );
-        } catch (NumberFormatException e) {JOptionPane.showMessageDialog(this,"Ingresa una cantidad válida.");
-            return;
-        }
+        } else if (total.isSelected()) {
+            montoPago = totalReserva;
 
-        if (montoPago <= anticipoMinimo || montoPago >= totalReserva) {
-            JOptionPane.showMessageDialog(this,"El pago parcial debe ser mayor al anticipo y menor al total.");
-            return;
+        } else if (parcial.isSelected()) {
+            try {
+                montoPago = Double.parseDouble(
+                        pagoparcial.getText().trim().replace(",", ".")
+                );
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Escribe una cantidad parcial válida."
+                );
+                return;
+            }
+
+            if (montoPago <= anticipoMinimo || montoPago >= totalReserva) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El pago parcial debe ser mayor al anticipo mínimo y menor al total."
+                );
+                return;
+            }
         }
     }
-
+//seleciona Cancha
+    
     String seleccionCancha =
             canchadisponible.getSelectedItem().toString();
     String codigoCancha = seleccionCancha.split(" - ")[0].trim();
@@ -2287,6 +2435,41 @@ private void cambiarControlesPago(boolean habilitados) {
     int horas = Integer.parseInt(
             duracion.getSelectedItem().toString().replaceAll("[^0-9]", "")
     );
+    
+    int jugadores = Integer.parseInt(
+        numerojugadores.getSelectedItem().toString()
+                .replaceAll("[^0-9]", "")
+);
+
+// Comprueba otra vez que la cancha siga disponible al guardar.
+Cancha[] disponiblesAhora = disponibilidad.buscarCanchasDisponibles(
+        fecha,
+        hora,
+        horas,
+        jugadores,
+        -1
+);
+
+boolean disponibleAhora = false;
+
+for (Cancha cancha : disponiblesAhora) {
+    if (cancha == null) {
+        break;
+    }
+
+    if (cancha.getCodigo().equalsIgnoreCase(
+            canchaSelecionada.getCodigo())) {
+        disponibleAhora = true;
+        break;
+    }
+}
+
+if (!disponibleAhora) {
+    JOptionPane.showMessageDialog(this,"Cancha no disponible");
+    return;
+}
+
+//crea Reserva
 
     int idReserva = persistenciaReservas.generarSiguienteId();
 
@@ -2302,19 +2485,26 @@ private void cambiarControlesPago(boolean habilitados) {
             ((Number) chaleco.getValue()).intValue()
     );
 
-    reserva.setEstado("CONFIRMADA");
+            if (montoPago > 0) {
+            reserva.setEstado("CONFIRMADA");
+        } else {
+            reserva.setEstado("PENDIENTE");
+        }
     reserva.setSubtotalCancha(subtotalCanchaActual);
     reserva.setTotalExtras(totalExtrasActual);
     reserva.setTotalReserva(totalReserva);
-
+    
+    
+    
+    
+    
+    
     if (!persistenciaReservas.agregarReserva(reserva)) {
-        JOptionPane.showMessageDialog(
-                this,
-                "No se pudo guardar la reserva."
-        );
+        JOptionPane.showMessageDialog(this,"No se pudo guardar la reserva.");
         return;
     }
-
+    
+    if (montoPago > 0) {
     Pago pagoInicial = new Pago(
             "P" + System.currentTimeMillis(),
             idReserva,
@@ -2331,32 +2521,53 @@ private void cambiarControlesPago(boolean habilitados) {
         return;
     }
 
+    // El pago ya se agregó. Ahora vencemos las cotizaciones que se traslapan.
+    int cotizacionesVencidas =
+            persistenciaReservas.vencerCotizacionesEnConflicto(
+                    canchaSelecionada.getCodigo(),
+                    fecha,
+                    hora,
+                    horas
+            );
+}
+    
+
     persistenciaReservas.mostrarReservas(tablareserva);
 
    double saldoPendiente = totalReserva - montoPago;
 
-    String mensaje =
-            "Reserva: R" + String.format("%03d", reserva.getIdReserva()) + "\n"
-            + "Cliente: " + reserva.getCliente().getNombre() + "\n"
-            + "Cancha: " + reserva.getCancha().getNombre() + "\n"
-            + "Fecha: " + reserva.getFecha() + "\n"
-            + "Horario: " + reserva.getHoraInicio()
-            + " - " + reserva.getHoraFinal() + "\n"
-            + "Duración: " + reserva.getDuracionHoras() + " hora(s)\n\n"
-            + "Balones: " + reserva.getBalon() + "\n"
-            + "Árbitros: " + reserva.getArbitro() + "\n"
-            + "Chalecos: " + reserva.getChalecos() + "\n\n"
-            + "Total: Q " + String.format("%.2f", totalReserva) + "\n"
-            + "Pagado: Q " + String.format("%.2f", montoPago) + "\n"
-            + "Pendiente: Q " + String.format("%.2f", saldoPendiente);
+   String mensaje =
+        "Reserva: R" + String.format("%03d", reserva.getIdReserva()) + "\n"
+        + "Cliente: " + reserva.getCliente().getNombre() + "\n"
+        + "Cancha: " + reserva.getCancha().getNombre() + "\n"
+        + "Fecha: " + reserva.getFecha() + "\n"
+        + "Horario: " + reserva.getHoraInicio()
+        + " - " + reserva.getHoraFinal() + "\n"
+        + "Duración: " + reserva.getDuracionHoras() + " hora(s)\n"
+        + "Balones: " + reserva.getBalon() + "\n"
+        + "Árbitros: " + reserva.getArbitro() + "\n"
+        + "Chalecos: " + reserva.getChalecos() + "\n"
+        + "Estado: " + reserva.getEstado();
 
+        if (montoPago > 0) {
+            double pendiente = Math.max(0, totalReserva - montoPago);
+
+            mensaje += "\n\nTotal: Q " + String.format("%.2f", totalReserva)
+                    + "\nPagado: Q " + String.format("%.2f", montoPago)
+                    + "\nPendiente: Q " + String.format("%.2f", saldoPendiente);
+        } else {
+            mensaje += "\n\nTotal estimado de la cotización: Q "
+                    + String.format("%.2f", totalReserva)
+                    + "\nCotización sin pago; todavía no está confirmada.";
+        }
     JOptionPane.showMessageDialog(
             this,
             mensaje,
             "Reserva realizada",
             JOptionPane.INFORMATION_MESSAGE
+            
     );
-
+limpiarFormularioReserva();
         
         
         
@@ -2393,10 +2604,7 @@ ventana.setVisible(true);
     String codigo = codigoReserva.getText().trim().toUpperCase();
 
     if (!codigo.matches("R\\d{3,}")) {
-        JOptionPane.showMessageDialog(
-                this,
-                "Escribe un código como R001."
-        );
+        JOptionPane.showMessageDialog(this,"Escribe un código como R001.");
         return;
     }
 
@@ -2404,11 +2612,7 @@ ventana.setVisible(true);
         int id = Integer.parseInt(codigo.substring(1));
         String codigoCorrecto = "R" + String.format("%03d", id);
 
-        if (!codigo.equals(codigoCorrecto)) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Formato incorrecto. ej. R001."
-            );
+        if (!codigo.equals(codigoCorrecto)) {JOptionPane.showMessageDialog(this,"Formato incorrecto. ej. R001.");
             return;
         }
 
@@ -2436,15 +2640,12 @@ ventana.setVisible(true);
         );
 
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(
-                this,
-                "El código debe tener formato R001."
-        );
+        JOptionPane.showMessageDialog(this,"El código debe tener formato R001.");
     }
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btcancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btcancelarActionPerformed
 
     if (reservaSeleccionada == null) {
         JOptionPane.showMessageDialog(this, "Primero busca una reserva.");
@@ -2474,7 +2675,30 @@ ventana.setVisible(true);
 
     if (respuesta == JOptionPane.YES_OPTION) {
         int id = reservaSeleccionada.getIdReserva();
-        boolean cancelada = persistenciaReservas.cancelarReserva(id);
+       
+        String motivo = JOptionPane.showInputDialog(
+        this,
+        "Escribe el motivo de la cancelación:"
+);
+
+            if (motivo == null) {
+                return; // Se canceló el cuadro de diálogo
+            }
+
+            motivo = motivo.trim();
+
+            if (motivo.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debes escribir un motivo.");
+                return;
+            }
+
+            String responsable = "USR001"; // Temporal hasta crear los usuarios
+
+            boolean cancelada = persistenciaReservas.cancelarReserva(
+                    id,
+                    motivo,
+                    responsable
+            );
 
         if (cancelada) {
             reservaSeleccionada = persistenciaReservas.buscarReserva(id);
@@ -2493,7 +2717,7 @@ ventana.setVisible(true);
     }
 
 
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btcancelarActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         if (reservaSeleccionada == null) {
@@ -2529,6 +2753,7 @@ ventana.setVisible(true);
     private javax.swing.JSpinner arbitro;
     private javax.swing.JButton bRegistrar;
     private javax.swing.JSpinner balon;
+    private javax.swing.JButton btcancelar;
     private javax.swing.JButton buscar;
     private javax.swing.JTextField busqueda;
     private javax.swing.JButton busquedacliente;
@@ -2550,7 +2775,6 @@ ventana.setVisible(true);
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private com.toedter.calendar.JDateChooser jDateChooser2;

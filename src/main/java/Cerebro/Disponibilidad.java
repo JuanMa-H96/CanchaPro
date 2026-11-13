@@ -69,10 +69,10 @@ public class Disponibilidad {
             Reserva reserva = persistenciaReservas.getReserva(i);
 
             if (reserva == null
-                    || reserva.getIdReserva() == idReservaExcluir
                     || reserva.getEstado().equalsIgnoreCase("CANCELADA")
                     || reserva.getEstado().equalsIgnoreCase("FINALIZADA")
-                    || reserva.getEstado().equalsIgnoreCase("VENCIDA")) {
+                    || reserva.getEstado().equalsIgnoreCase("VENCIDA")
+                    || reserva.getEstado().equalsIgnoreCase("PENDIENTE")) {
                 continue;
             }
 
