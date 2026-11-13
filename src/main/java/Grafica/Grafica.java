@@ -426,7 +426,7 @@ private void cambiarControlesPago(boolean habilitados) {
 
         JOptionPane.showMessageDialog(
                 this,
-                "Reserva modificada en el arreglo. Presiona Actualizar para guardar el CSV."
+                "Reserva modificada"
         );
 
         reservaEnEdicion = null;
@@ -2392,13 +2392,26 @@ ventana.setVisible(true);
 
     String codigo = codigoReserva.getText().trim().toUpperCase();
 
-    if (!codigo.startsWith("R")) {
-        JOptionPane.showMessageDialog(this, "Escribe el código, por ejemplo R001.");
+    if (!codigo.matches("R\\d{3,}")) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Escribe un código como R001."
+        );
         return;
     }
 
     try {
         int id = Integer.parseInt(codigo.substring(1));
+        String codigoCorrecto = "R" + String.format("%03d", id);
+
+        if (!codigo.equals(codigoCorrecto)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Formato incorrecto. ej. R001."
+            );
+            return;
+        }
+
         reservaSeleccionada = persistenciaReservas.buscarReserva(id);
 
         if (reservaSeleccionada == null) {
@@ -2407,7 +2420,7 @@ ventana.setVisible(true);
         }
 
         datosReserva.setText(
-                "Código: R" + String.format("%03d", reservaSeleccionada.getIdReserva())
+                "Código: " + codigoCorrecto
                 + "\nCliente: " + reservaSeleccionada.getCliente().getNombre()
                 + "\nCancha: " + reservaSeleccionada.getCancha().getNombre()
                 + "\nFecha: " + reservaSeleccionada.getFecha()
@@ -2418,11 +2431,15 @@ ventana.setVisible(true);
                 + "\nBalones: " + reservaSeleccionada.getBalon()
                 + "\nÁrbitros: " + reservaSeleccionada.getArbitro()
                 + "\nChalecos: " + reservaSeleccionada.getChalecos()
-                + "\nTotal: Q" + String.format("%.2f", reservaSeleccionada.getTotalReserva())
+                + "\nTotal: Q"
+                + String.format("%.2f", reservaSeleccionada.getTotalReserva())
         );
 
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "El código debe tener formato R001.");
+        JOptionPane.showMessageDialog(
+                this,
+                "El código debe tener formato R001."
+        );
     }
 
     }//GEN-LAST:event_jButton2ActionPerformed

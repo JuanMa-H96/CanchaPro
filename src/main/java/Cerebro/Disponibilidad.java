@@ -39,7 +39,7 @@ public class Disponibilidad {
                     && cancha.isActivo()
                     && !cancha.getEstado().equalsIgnoreCase("INACTIVA")
                     && !cancha.getEstado().equalsIgnoreCase("MANTENIMIENTO")
-                    && cancha.getLimitePorEquipo() >= jugadores
+                    && cancha.getTipoFutbol() == jugadores
                     && estaLibre(
                             cancha, fecha, horaInicio, duracionHoras, idReservaExcluir
                     );
