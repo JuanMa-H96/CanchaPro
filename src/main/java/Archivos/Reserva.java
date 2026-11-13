@@ -17,6 +17,8 @@ public class Reserva {
     private int balon;
     private int arbitro;
     private int chalecos;
+    
+    
 
     public Reserva(int idReserva, Cliente cliente, Cancha cancha, LocalDate fecha, LocalTime horaInicio, int duracionHoras,
             int balon, int arbitro, int chalecos){
