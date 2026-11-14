@@ -19,14 +19,10 @@ public Reservas(
 
     this.persistenciaReservas = persistenciaReservas;
     this.persistenciaPagos = persistenciaPagos;
-
-    persistenciaReservas.mostrarTodasReservas(
-            todasreservas,
-            persistenciaPagos
-    );
     
-    persistenciaReservas.actualizarEstadosFinalizados();
-    persistenciaReservas.mostrarTodasReservas(todasreservas, persistenciaPagos);
+    persistenciaReservas.actualizarEstadosPorHora();
+    persistenciaReservas.mostrarTodasReservas(todasreservas,persistenciaPagos);
+    
     colorearFilasPorEstado();
 }
 

@@ -1,4 +1,5 @@
 package Cerebro;
+import Archivos.Pago;
 
 import Archivos.Pago;
 import java.io.BufferedReader;
@@ -16,55 +17,70 @@ public class PersistenciaPago{
     private Pago[] pagos = new Pago[CAPACIDAD];
     private int cantidadPagos = 0;
 
-    public void leerPagos() {
-        cantidadPagos = 0;
+   public void leerPagos() {
+    cantidadPagos = 0;
 
-        try {
-            BufferedReader lector = new BufferedReader(new FileReader(ruta));
-            String linea = lector.readLine(); // Saltar encabezado
+    try (BufferedReader lector = new BufferedReader(new FileReader(ruta))) {
+        lector.readLine(); 
 
-            while ((linea = lector.readLine()) != null
-                    && cantidadPagos < CAPACIDAD) {
+        String linea;
 
-                String[] datos = linea.split(",", -1);
+        while ((linea = lector.readLine()) != null
+                && cantidadPagos < CAPACIDAD) {
 
-                if (datos.length < 5) {
-                    continue;
-                }
-
-                try {
-                    String codigoPago = datos[0].trim();
-                    int idReserva = Integer.parseInt(
-                            datos[1].replace("R", "").trim()
-                    );
-                    java.time.LocalDateTime fechaHora =
-                            java.time.LocalDateTime.parse(datos[2].trim());
-                    double monto = Double.parseDouble(datos[3].trim());
-                    String metodoPago = datos[4].trim();
-
-                    Pago pago = new Pago(
-                            codigoPago,
-                            idReserva,
-                            fechaHora,
-                            monto,
-                            metodoPago
-                    );
-
-                    pagos[cantidadPagos] = pago;
-                    cantidadPagos++;
-
-                } catch (RuntimeException e) {
-                    System.out.println("Fila de pago ignorada: " + linea);
-                }
+            if (linea.trim().isEmpty()) {
+                continue;
             }
 
-            lector.close();
-            System.out.println("Pagos leídos: " + cantidadPagos);
+            String[] datos = linea.split(",", -1);
 
-        } catch (IOException e) {
-            System.out.println("Error al leer pagos: " + e.getMessage());
+            if (datos.length < 5) {
+                continue;
+            }
+
+            try {
+                String codigoPago = datos[0].trim();
+
+                int idReserva = Integer.parseInt(
+                        datos[1].replace("R", "").trim()
+                );
+
+                java.time.LocalDateTime fechaHora =
+                        java.time.LocalDateTime.parse(datos[2].trim());
+
+                double monto = Double.parseDouble(datos[3].trim());
+                String metodoPago = datos[4].trim();
+
+           
+                String usuarioResponsable = "SIN_REGISTRO";
+
+                if (datos.length > 5 && !datos[5].trim().isEmpty()) {
+                    usuarioResponsable = datos[5].trim();
+                }
+
+                Pago pago = new Pago(
+                        codigoPago,
+                        idReserva,
+                        fechaHora,
+                        monto,
+                        metodoPago,
+                        usuarioResponsable
+                );
+
+                pagos[cantidadPagos] = pago;
+                cantidadPagos++;
+
+            } catch (RuntimeException e) {
+                System.out.println("Fila de pago ignorada: " + linea);
+            }
         }
+
+        System.out.println("Pagos leídos: " + cantidadPagos);
+
+    } catch (IOException e) {
+        System.out.println("Error al leer pagos: " + e.getMessage());
     }
+}
     
     public boolean agregarPago(Pago pago) {
         if (cantidadPagos >= CAPACIDAD) {
@@ -76,33 +92,35 @@ public class PersistenciaPago{
         return true;
     }
  
-    public boolean guardarPago(Pago pago) {
-        File archivo = new File(ruta);
-        boolean escribirEncabezado = !archivo.exists() || archivo.length() == 0;
+    public boolean guardarPagos() {
+        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ruta))) {
+            escritor.write(
+                    "codigoPago,idReserva,fechaHora,monto,metodoPago,codigoUsuarioResponsable"
+            );
+            escritor.newLine();
 
-        try (BufferedWriter escritor =
-                new BufferedWriter(new FileWriter(archivo, true))) {
+            for (int i = 0; i < cantidadPagos; i++) {
+                Pago pago = pagos[i];
 
-            if (escribirEncabezado) {
+                if (pago == null) {
+                    continue;
+                }
+
                 escritor.write(
-                    "codigoPago,idReserva,fechaHora,monto,metodoPago"
+                        pago.getCodigoPago() + ","
+                        + "R" + String.format("%03d", pago.getIdReserva()) + ","
+                        + pago.getFechaHora() + ","
+                        + String.format(java.util.Locale.US, "%.2f", pago.getMonto()) + ","
+                        + pago.getMetodoPago() + ","
+                        + pago.getCodigoUsuarioResponsable()
                 );
                 escritor.newLine();
             }
 
-            escritor.write(
-                    pago.getCodigoPago() + ","
-                    + "R" + String.format("%03d", pago.getIdReserva()) + ","
-                    + pago.getFechaHora() + ","
-                    + String.format("%.2f", pago.getMonto()) + ","
-                    + pago.getMetodoPago()
-            );
-            escritor.newLine();
-
             return true;
 
         } catch (IOException e) {
-            System.out.println("Error al guardar el pago: " + e.getMessage());
+            System.out.println("Error al guardar pagos: " + e.getMessage());
             return false;
         }
     }
@@ -122,6 +140,19 @@ public class PersistenciaPago{
     }
     
     
-    
+    public double getTotalPagadoEnFecha(java.time.LocalDate fecha) {
+    double total = 0;
+
+    for (int i = 0; i < cantidadPagos; i++) {
+        Pago pago = pagos[i];
+
+        if (pago != null
+                && pago.getFechaHora().toLocalDate().equals(fecha)) {
+            total += pago.getMonto();
+        }
+    }
+
+    return total;
+}
     
 }

@@ -1,21 +1,26 @@
 package Archivos;
 
+import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
 public class Cliente {
 
+    private String codigo;
     private String nombre;
     private String telefono;
     private String email;
-    private String codigo;
     private boolean activo;
+    private LocalDate fechaRegistro;
 
-    public Cliente(String nombre, String telefono, String email, String codigo) {
+    public Cliente(String nombre, String telefono, String email, String codigo, LocalDate fechaRegistro) {
         this.nombre = nombre;
         this.telefono = telefono;
         this.email = email;
         this.codigo = codigo;
         this.activo = true;
+        this.fechaRegistro = fechaRegistro == null
+        ? LocalDate.now()
+        : fechaRegistro;
     }
 
     public String getNombre() {
@@ -57,6 +62,14 @@ public class Cliente {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+    
+    public LocalDate getFechaRegistro() {
+    return fechaRegistro;
+    }
+
+    public void setFechaRegistro(LocalDate fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
 
     public void mostrarcliente() {
         JOptionPane.showMessageDialog(null,
@@ -65,6 +78,7 @@ public class Cliente {
                 + "\nTeléfono: " + telefono
                 + "\nEmail: " + email
                 + "\nCódigo: " + codigo
-                + "\nEstado: " + (activo ? "Activo" : "Inactivo"));
+                + "\nEstado: " + (activo ? "Activo" : "Inactivo")
+                 +"\nFecha de Registro: " + fechaRegistro);
     }
 }

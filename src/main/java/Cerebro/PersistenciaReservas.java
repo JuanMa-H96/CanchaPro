@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -57,11 +58,20 @@ public class PersistenciaReservas {
     );
 
                 reserva.setEstado(datos[4].trim());
-                if (datos.length >= 14) {
-                    reserva.setSubtotalCancha(Double.parseDouble(datos[11]));
-                    reserva.setTotalExtras(Double.parseDouble(datos[12]));
-                    reserva.setTotalReserva(Double.parseDouble(datos[13]));
-                }
+       
+                    if (datos.length > 14 && !datos[14].trim().isEmpty()) {
+                        reserva.setFechaCancelacion(
+                                java.time.LocalDateTime.parse(datos[14].trim())
+                        );
+                    }
+
+                    if (datos.length > 15) {
+                        reserva.setMotivoCancelacion(datos[15].trim());
+                    }
+
+                    if (datos.length > 16) {
+                        reserva.setUsuarioResponsableCancelacion(datos[16].trim());
+                    }
 
                 reservas[cantidad] = reserva;
                 cantidad++;
@@ -183,13 +193,9 @@ public class PersistenciaReservas {
     
     
     public void mostrarReservas(JTable tabla) {
-        String[] columnas = {
-            "Código", "Cliente", "Cancha", "Fecha", "Horario", "Estado"
-        };
-
-        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+        DefaultTableModel modelo = new DefaultTableModel() {
             @Override
-            public boolean isCellEditable(int fila, int columna) {
+        public boolean isCellEditable(int fila, int columna) {
                 return false;
             }
         };
@@ -230,36 +236,14 @@ public class PersistenciaReservas {
         tabla.setModel(modelo);
     }
     
-    public void mostrarTodasReservas(
+  public void mostrarTodasReservas(
         JTable tabla,
-        PersistenciaPago persistenciaPagos
-) {
-    String[] columnas = {
-        "Reserva (código)",
-        "Cliente (nombre)",
-        "Cancha (nombre)",
-        "Fecha",
-        "Horario (inicio-final)",
-        "Duración",
-        "Estado",
-        "Balones",
-        "Árbitros",
-        "Chalecos",
-        "Total Q",
-        "Cancelado Q",
-        "Pendiente Q",
-        "Fecha de cancelación",
-        "Usuario responsable",
-        "Motivo"
-            
-    };
+        PersistenciaPago persistenciaPagos) {
 
-    DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
-        @Override
-        public boolean isCellEditable(int fila, int columna) {
-            return false;
-        }
-    };
+    DefaultTableModel modelo =
+            (DefaultTableModel) tabla.getModel();
+
+    modelo.setRowCount(0); 
 
     for (int i = 0; i < cantidad; i++) {
         Reserva reserva = reservas[i];
@@ -269,41 +253,44 @@ public class PersistenciaReservas {
         }
 
         double total = reserva.getTotalReserva();
-        double pagado = persistenciaPagos.getTotalPagadoReserva(reserva.getIdReserva());
+
+        double pagado = persistenciaPagos.getTotalPagadoReserva(
+                reserva.getIdReserva()
+        );
+
         double pendiente = Math.max(0, total - pagado);
 
+        
         if (reserva.getEstado().equalsIgnoreCase("PENDIENTE")) {
             pagado = 0;
             pendiente = 0;
         }
-     modelo.addRow(new Object[]{
-              "R" + String.format("%03d", reserva.getIdReserva()),
-              reserva.getCliente().getNombre(),
-              reserva.getCancha().getNombre(),
-              reserva.getFecha(),
-              reserva.getHoraInicio() + " - " + reserva.getHoraFinal(),
-              reserva.getDuracionHoras(),
-              reserva.getEstado(),
-              reserva.getBalon(),
-              reserva.getArbitro(),
-              reserva.getChalecos(),
-              String.format("Q %.2f", total),
-              String.format("Q %.2f", pagado),
-              String.format("Q %.2f", pendiente),
 
-              reserva.getFechaCancelacion() == null
-                      ? ""
-                      : reserva.getFechaCancelacion().toString().replace("T", " "),
-              reserva.getUsuarioResponsableCancelacion() == null
-                      ? ""
-                      : reserva.getUsuarioResponsableCancelacion(),
-              reserva.getMotivoCancelacion() == null
-                      ? ""
-                      : reserva.getMotivoCancelacion()
-          });
+        modelo.addRow(new Object[]{
+            "R" + String.format("%03d", reserva.getIdReserva()),
+            reserva.getCliente().getNombre(),
+            reserva.getCancha().getNombre(),
+            reserva.getFecha(),
+            reserva.getHoraInicio() + " - " + reserva.getHoraFinal(),
+            reserva.getDuracionHoras(),
+            reserva.getEstado(),
+            reserva.getBalon(),
+            reserva.getArbitro(),
+            reserva.getChalecos(),
+            String.format("Q %.2f", total),
+            String.format("Q %.2f", pagado),
+            String.format("Q %.2f", pendiente),
+            reserva.getFechaCancelacion() == null
+                    ? ""
+                    : reserva.getFechaCancelacion().toString().replace("T", " "),
+            reserva.getUsuarioResponsableCancelacion() == null
+                    ? ""
+                    : reserva.getUsuarioResponsableCancelacion(),
+            reserva.getMotivoCancelacion() == null
+                    ? ""
+                    : reserva.getMotivoCancelacion()
+        });
     }
-
-    tabla.setModel(modelo);
 }
     
     public int getCantidadReservas() {
@@ -410,8 +397,49 @@ public class PersistenciaReservas {
         return cantidadVencidas;
     }
     
-    
-    
+   public boolean actualizarEstadosPorHora() {
+    java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+    boolean huboCambios = false;
+
+    for (int i = 0; i < cantidad; i++) {
+        Reserva reserva = reservas[i];
+
+        if (reserva == null) {
+            continue;
+        }
+
+        String estado = reserva.getEstado();
+
+        if (!estado.equalsIgnoreCase("CONFIRMADA")
+                && !estado.equalsIgnoreCase("EN_CURSO")) {
+            continue;
+        }
+
+        java.time.LocalDateTime inicio = java.time.LocalDateTime.of(
+                reserva.getFecha(),
+                reserva.getHoraInicio()
+        );
+
+        java.time.LocalDateTime fin = java.time.LocalDateTime.of(
+                reserva.getFecha(),
+                reserva.getHoraFinal()
+        );
+
+        if (!ahora.isBefore(fin)) {
+            // La hora final ya pasó.
+            reserva.setEstado("FINALIZADA");
+            huboCambios = true;
+
+        } else if (estado.equalsIgnoreCase("CONFIRMADA")
+                && !ahora.isBefore(inicio)) {
+            // Ya empezó, pero todavía no termina.
+            reserva.setEstado("EN_CURSO");
+            huboCambios = true;
+        }
+    }
+
+    return huboCambios;
+}
     
     
     
