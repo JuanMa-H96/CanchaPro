@@ -4,6 +4,7 @@ import Cerebro.PersistenciaCancha;
 import Cerebro.PersistenciaClientes;
 import Cerebro.PersistenciaPago;
 import Cerebro.PersistenciaReservas;
+import Cerebro.PersistenciaTienda;
 
 public class Reportes extends javax.swing.JFrame {
     
@@ -13,6 +14,7 @@ public class Reportes extends javax.swing.JFrame {
     private PersistenciaCancha persistenciaCanchas;
     private PersistenciaReservas persistenciaReservas;
     private PersistenciaPago persistenciaPagos;
+    private PersistenciaTienda persistenciaTienda;
 
 private String moduloSeleccionado = "RESERVAS";
 
@@ -22,7 +24,8 @@ public Reportes(
         PersistenciaClientes clientes,
         PersistenciaCancha canchas,
         PersistenciaReservas reservas,
-        PersistenciaPago pagos) {
+        PersistenciaPago pagos,
+        PersistenciaTienda tienda) {
 
     initComponents();
 
@@ -30,6 +33,7 @@ public Reportes(
     this.persistenciaCanchas = canchas;
     this.persistenciaReservas = reservas;
     this.persistenciaPagos = pagos;
+    this.persistenciaTienda = tienda;
     
     colorearFilasPorEstado();
     mostrarReservas();
@@ -82,6 +86,15 @@ private void mostrarReporte() {
             titulo.setText("Pagos: " + textoFiltro);
             persistenciaPagos.mostrarPagos(tablareporte, filtro);
             break;
+            
+        case "TIENDA":
+            titulo.setText("Compras de tienda: " + textoFiltro);
+            persistenciaTienda.mostrarCompras(
+            tablareporte,
+            textoFiltro,
+            persistenciaPagos
+    );
+    break;
     }
 
     colorearFilasPorEstado();
@@ -209,6 +222,7 @@ private void colorearFilasPorEstado() {
         fechainicio = new com.toedter.calendar.JDateChooser();
         jPanel2 = new javax.swing.JPanel();
         filtroReporte = new javax.swing.JComboBox<>();
+        tienda = new javax.swing.JButton();
         pagos = new javax.swing.JButton();
         canchas = new javax.swing.JButton();
         reservas = new javax.swing.JButton();
@@ -237,13 +251,13 @@ private void colorearFilasPorEstado() {
         ));
         jScrollPane1.setViewportView(tablareporte);
 
-        Panelreserva.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 1750, 500));
+        Panelreserva.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 1750, 290));
 
         atras.setBackground(new java.awt.Color(0, 153, 255));
         atras.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         atras.setText("Salir");
         atras.addActionListener(this::atrasActionPerformed);
-        Panelreserva.add(atras, new org.netbeans.lib.awtextra.AbsoluteConstraints(1640, 620, 130, 50));
+        Panelreserva.add(atras, new org.netbeans.lib.awtextra.AbsoluteConstraints(1600, 20, 130, 50));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -253,7 +267,8 @@ private void colorearFilasPorEstado() {
         generar.setText("Generar Reporte");
         generar.addActionListener(this::generarActionPerformed);
 
-        reporte.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "RESERVAS", "INGRESOS" }));
+        reporte.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "RESERVAS", "INGRESOS", "INGRESOS TIENDA" }));
+        reporte.addActionListener(this::reporteActionPerformed);
 
         fechafinal.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
@@ -286,7 +301,7 @@ private void colorearFilasPorEstado() {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        Panelreserva.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 600, 800, 80));
+        Panelreserva.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 600, 800, 80));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -294,6 +309,12 @@ private void colorearFilasPorEstado() {
         filtroReporte.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         filtroReporte.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODAS", "PENDIENTE", "CONFIRMADA", "EN_CURSO", "FINALIZADA", "CANCELADA", "VENCIDA" }));
         filtroReporte.addActionListener(this::filtroReporteActionPerformed);
+
+        tienda.setBackground(new java.awt.Color(204, 255, 255));
+        tienda.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        tienda.setText("Tienda");
+        tienda.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        tienda.addActionListener(this::tiendaActionPerformed);
 
         pagos.setBackground(new java.awt.Color(204, 255, 255));
         pagos.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
@@ -324,12 +345,12 @@ private void colorearFilasPorEstado() {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(reservas, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(canchas, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(pagos, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
+                .addComponent(tienda, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(filtroReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
@@ -337,16 +358,17 @@ private void colorearFilasPorEstado() {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(22, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(filtroReporte)
-                    .addComponent(pagos, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(canchas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(reservas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(clientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(reservas, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(canchas, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pagos, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tienda, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filtroReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(16, 16, 16))
         );
 
-        Panelreserva.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 600, 800, 80));
+        Panelreserva.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 600, 930, 80));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -396,10 +418,11 @@ private void colorearFilasPorEstado() {
     }//GEN-LAST:event_atrasActionPerformed
 
     private void generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarActionPerformed
- 
+
     if (fechainicio.getDate() == null || fechafinal.getDate() == null) {
         javax.swing.JOptionPane.showMessageDialog(
-                this, "Selecciona la fecha inicial y la fecha final."
+                this,
+                "Selecciona la fecha inicial y la fecha final."
         );
         return;
     }
@@ -414,7 +437,8 @@ private void colorearFilasPorEstado() {
 
     if (desde.isAfter(hasta)) {
         javax.swing.JOptionPane.showMessageDialog(
-                this, "La fecha inicial no puede ser posterior a la fecha final."
+                this,
+                "La fecha inicial no puede ser posterior a la fecha final."
         );
         return;
     }
@@ -423,7 +447,8 @@ private void colorearFilasPorEstado() {
 
     if (seleccion == null) {
         javax.swing.JOptionPane.showMessageDialog(
-                this, "Selecciona RESERVAS o INGRESOS."
+                this,
+                "Selecciona RESERVAS, INGRESOS o INGRESOS TIENDA."
         );
         return;
     }
@@ -443,6 +468,15 @@ private void colorearFilasPorEstado() {
             titulo.setText("Reservas del " + desde + " al " + hasta);
         }
 
+    } else if (opcion.equalsIgnoreCase("INGRESOS TIENDA")) {
+        moduloSeleccionado = "PAGOS";
+
+        persistenciaPagos.mostrarIngresosTiendaPorPeriodo(
+                tablareporte, desde, hasta
+        );
+
+        titulo.setText("Ingresos de tienda del " + desde + " al " + hasta);
+
     } else if (opcion.equalsIgnoreCase("INGRESOS")) {
         moduloSeleccionado = "PAGOS";
 
@@ -454,12 +488,15 @@ private void colorearFilasPorEstado() {
 
     } else {
         javax.swing.JOptionPane.showMessageDialog(
-                this, "Selecciona RESERVAS o INGRESOS."
+                this,
+                "Selecciona RESERVAS, INGRESOS o INGRESOS TIENDA."
         );
         return;
     }
 
     colorearFilasPorEstado();
+
+    
 
 
     }//GEN-LAST:event_generarActionPerformed
@@ -467,6 +504,20 @@ private void colorearFilasPorEstado() {
     private void filtroReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtroReporteActionPerformed
        mostrarReporte();
     }//GEN-LAST:event_filtroReporteActionPerformed
+
+    private void tiendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tiendaActionPerformed
+            configurarFiltro("TIENDA", new String[]{
+        "TODAS",
+        "SALDO PENDIENTE",
+        "PAGADO COMPLETO"
+    });
+
+    titulo.setText("Compras de tienda: TODAS");
+    }//GEN-LAST:event_tiendaActionPerformed
+
+    private void reporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reporteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_reporteActionPerformed
 
     
 
@@ -486,6 +537,7 @@ private void colorearFilasPorEstado() {
     private javax.swing.JComboBox<String> reporte;
     private javax.swing.JButton reservas;
     private javax.swing.JTable tablareporte;
+    private javax.swing.JButton tienda;
     private javax.swing.JLabel titulo;
     // End of variables declaration//GEN-END:variables
 
