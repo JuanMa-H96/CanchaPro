@@ -19,10 +19,18 @@ public Reservas(
 
     this.persistenciaReservas = persistenciaReservas;
     this.persistenciaPagos = persistenciaPagos;
-    
+
     persistenciaReservas.actualizarEstadosPorHora();
-    persistenciaReservas.mostrarTodasReservas(todasreservas,persistenciaPagos);
-    
+
+    // El primer elemento del combo debe ser "TODAS".
+       ver.setSelectedItem("TODAS");
+
+    persistenciaReservas.mostrarReservasPorEstado(
+            todasreservas,
+            "TODAS",
+            persistenciaPagos
+    );
+
     colorearFilasPorEstado();
 }
 
@@ -77,87 +85,136 @@ private void colorearFilasPorEstado() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel3 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jScrollPane6 = new javax.swing.JScrollPane();
+        Panelreserva = new javax.swing.JPanel();
+        titulo = new javax.swing.JLabel();
+        atras = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
         todasreservas = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        ver = new javax.swing.JComboBox<>();
+        atras1 = new javax.swing.JButton();
+        atras2 = new javax.swing.JButton();
+        atras3 = new javax.swing.JButton();
+        atras4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Todas las Reservas");
+        Panelreserva.setBackground(new java.awt.Color(255, 255, 255));
+        Panelreserva.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        titulo.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        titulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titulo.setText("Todas las Reservas");
+        Panelreserva.add(titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 20, 390, 57));
+
+        atras.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        atras.setText("Atras");
+        atras.addActionListener(this::atrasActionPerformed);
+        Panelreserva.add(atras, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 630, 140, -1));
 
         todasreservas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Reserva", "Cliente", "Cancha", "Fecha", "Horario", "Duracion", "Estado", "Balones", "Arbitros", "Chalecos", "Total Q", "Pagado Q", "Pendiente Q", "Fecha Cancelacion", "Usuario", "Motivo"
+                "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane6.setViewportView(todasreservas);
+        jScrollPane1.setViewportView(todasreservas);
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        jButton1.setText("Atras");
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        Panelreserva.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 1430, 520));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(513, 513, 513)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(549, 549, 549)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(690, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28))
-        );
+        ver.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        ver.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODAS", "PENDIENTE", "CONFIRMADA", "EN_CURSO", "FINALIZADA", "CANCELADA", "VENCIDA" }));
+        ver.addActionListener(this::verActionPerformed);
+        Panelreserva.add(ver, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 630, 290, 40));
+
+        atras1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        atras1.setText("Atras");
+        atras1.addActionListener(this::atras1ActionPerformed);
+        Panelreserva.add(atras1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1230, 630, 219, -1));
+
+        atras2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        atras2.setText("Clientes");
+        atras2.addActionListener(this::atras2ActionPerformed);
+        Panelreserva.add(atras2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 630, 130, -1));
+
+        atras3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        atras3.setText("Reservas");
+        atras3.addActionListener(this::atras3ActionPerformed);
+        Panelreserva.add(atras3, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 630, 160, -1));
+
+        atras4.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        atras4.setText("Atras");
+        atras4.addActionListener(this::atras4ActionPerformed);
+        Panelreserva.add(atras4, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 630, 140, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(Panelreserva, javax.swing.GroupLayout.PREFERRED_SIZE, 1479, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(Panelreserva, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void atrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atrasActionPerformed
        this.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_atrasActionPerformed
+
+    private void verActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verActionPerformed
+
+    String estado = ver.getSelectedItem().toString();
+
+    persistenciaReservas.mostrarReservasPorEstado(
+            todasreservas,
+            estado,
+            persistenciaPagos
+    );
+
+    colorearFilasPorEstado();
+
+    }//GEN-LAST:event_verActionPerformed
+
+    private void atras1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atras1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_atras1ActionPerformed
+
+    private void atras2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atras2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_atras2ActionPerformed
+
+    private void atras3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atras3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_atras3ActionPerformed
+
+    private void atras4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atras4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_atras4ActionPerformed
 
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JPanel Panelreserva;
+    private javax.swing.JButton atras;
+    private javax.swing.JButton atras1;
+    private javax.swing.JButton atras2;
+    private javax.swing.JButton atras3;
+    private javax.swing.JButton atras4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel titulo;
     private javax.swing.JTable todasreservas;
+    private javax.swing.JComboBox<String> ver;
     // End of variables declaration//GEN-END:variables
 }
