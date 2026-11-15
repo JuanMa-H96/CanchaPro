@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Pago {
 
+    
     private String codigoPago;
     private int idReserva;
     private LocalDateTime fechaHora;

@@ -6,6 +6,7 @@ import Cerebro.PersistenciaPago;
 import Cerebro.PersistenciaReservas;
 import Cerebro.PersistenciaTienda;
 
+
 public class Reportes extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Reportes.class.getName());

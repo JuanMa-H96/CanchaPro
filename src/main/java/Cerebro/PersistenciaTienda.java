@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
+
 public class PersistenciaTienda {
 
     private static final int CAPACIDAD_PRODUCTOS = 100;

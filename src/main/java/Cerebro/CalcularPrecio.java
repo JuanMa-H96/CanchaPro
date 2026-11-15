@@ -15,6 +15,7 @@ public class CalcularPrecio {
     private double precioArbitro = 75.00;
     private double precioChaleco = 10.00;
 
+    
    public double calcularSubtotalCancha(Cancha cancha, LocalDate fecha, LocalTime horaInicio, int duracionHoras) {
     double precioPorHora = cancha.getPrecioHora();
 

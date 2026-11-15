@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 public class PagoG extends javax.swing.JFrame {
     
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PagoG.class.getName());
 
         private Archivos.Reserva reservaActual;

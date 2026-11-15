@@ -16,6 +16,7 @@ public class PersistenciaCancha {
     String rutacancha = "C:\\Users\\juan1\\OneDrive\\Documentos\\NetBeansProjects\\CanchaPro\\persistencia/canchas.csv";
     
     
+    
   public void leerCanchas() {
     cantidadCanchas = 0;
 

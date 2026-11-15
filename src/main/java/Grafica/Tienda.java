@@ -27,6 +27,7 @@ public class Tienda extends javax.swing.JFrame {
 }    
         
         
+    
         
 
 public void prepararTienda(

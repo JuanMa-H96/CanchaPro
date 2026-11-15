@@ -15,6 +15,7 @@ public class Disponibilidad {
         this.persistenciaReservas = persistenciaReservas;
     }
 
+    
     public Cancha[] buscarCanchasDisponibles(
             LocalDate fecha, LocalTime horaInicio,
             int duracionHoras, int jugadores) {

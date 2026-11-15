@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
+
 public class PersistenciaClientes {
 
     private String ruta =

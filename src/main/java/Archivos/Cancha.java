@@ -4,6 +4,7 @@ import java.time.LocalTime;
 
 public class Cancha {
 
+    
     private String codigo;
     private String nombre;
     private int tipoFutbol;
