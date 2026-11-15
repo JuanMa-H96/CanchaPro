@@ -102,9 +102,10 @@ public nuevaCancha(PersistenciaCancha persistencia, Grafica graficaPrincipal, Ar
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
         jPanel15.setBorder(new javax.swing.border.MatteBorder(null));
 
-        Crear.setBackground(new java.awt.Color(204, 204, 204));
+        Crear.setBackground(new java.awt.Color(204, 255, 255));
         Crear.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
         Crear.setText("Crear");
         Crear.addActionListener(this::CrearActionPerformed);
@@ -134,6 +135,8 @@ public nuevaCancha(PersistenciaCancha persistencia, Grafica graficaPrincipal, Ar
         jLabel66.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel66.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel66.setText("Tipo");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel63.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         jLabel63.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

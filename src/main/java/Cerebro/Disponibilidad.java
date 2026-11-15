@@ -36,13 +36,13 @@ public class Disponibilidad {
             Cancha cancha = persistenciaCanchas.getCancha(i);
 
             boolean puedeUsarse = cancha != null
-                    && cancha.isActivo()
-                    && !cancha.getEstado().equalsIgnoreCase("INACTIVA")
-                    && !cancha.getEstado().equalsIgnoreCase("MANTENIMIENTO")
-                    && cancha.getTipoFutbol() == jugadores
-                    && estaLibre(
-                            cancha, fecha, horaInicio, duracionHoras, idReservaExcluir
-                    );
+                && cancha.isActivo()
+                && (cancha.getEstado() == null
+                    || !cancha.getEstado().equalsIgnoreCase("INACTIVA"))
+                && cancha.getTipoFutbol() == jugadores
+                && estaLibre(
+                        cancha, fecha, horaInicio, duracionHoras, idReservaExcluir
+                );
 
             if (puedeUsarse) {
                 disponibles[cantidadDisponibles] = cancha;
@@ -68,7 +68,9 @@ public class Disponibilidad {
         for (int i = 0; i < persistenciaReservas.getCantidadReservas(); i++) {
             Reserva reserva = persistenciaReservas.getReserva(i);
 
-            if (reserva == null
+          if (reserva == null
+                    || reserva.getIdReserva() == idReservaExcluir
+                    || reserva.getCancha() == null
                     || reserva.getEstado().equalsIgnoreCase("CANCELADA")
                     || reserva.getEstado().equalsIgnoreCase("FINALIZADA")
                     || reserva.getEstado().equalsIgnoreCase("VENCIDA")
@@ -98,7 +100,53 @@ public class Disponibilidad {
     } 
     
     
-   
+   public String obtenerEstadoActual(Cancha cancha) {
+  if (cancha == null || !cancha.isActivo()|| cancha.getEstado().equalsIgnoreCase("INACTIVA")) {
+    return "INACTIVA";
+}
+    java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+    boolean enMantenimiento = false;
+
+    for (int i = 0; i < persistenciaReservas.getCantidadReservas(); i++) {
+        Reserva reserva = persistenciaReservas.getReserva(i);
+
+        if (reserva == null
+                || reserva.getCancha() == null
+                || !reserva.getCancha().getCodigo()
+                        .equalsIgnoreCase(cancha.getCodigo())) {
+            continue;
+        }
+
+        String estadoReserva = reserva.getEstado();
+
+        if (estadoReserva.equalsIgnoreCase("CANCELADA")
+                || estadoReserva.equalsIgnoreCase("VENCIDA")
+                || estadoReserva.equalsIgnoreCase("PENDIENTE")) {
+            continue;
+        }
+
+        java.time.LocalDateTime inicio =
+                reserva.getFecha().atTime(reserva.getHoraInicio());
+
+        java.time.LocalDateTime fin =
+                reserva.getFecha().atTime(reserva.getHoraFinal());
+
+        if (!ahora.isBefore(inicio) && ahora.isBefore(fin)) {
+            return "EN_CURSO";
+        }
+
+        if (!ahora.isBefore(fin)
+                && ahora.isBefore(fin.plusMinutes(15))) {
+            enMantenimiento = true;
+        }
+    }
+
+    if (enMantenimiento) {
+        return "MANTENIMIENTO";
+    }
+
+    return "LIBRE";
+}
 
 
 }

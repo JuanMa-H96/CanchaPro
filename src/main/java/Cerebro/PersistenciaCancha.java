@@ -13,40 +13,66 @@ public class PersistenciaCancha {
     private Cancha[] canchas = new Cancha[100];
     private int cantidadCanchas = 0;
     
-    String rutacancha = "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia/canchas.csv";
+    String rutacancha = "C:\\Users\\juan1\\OneDrive\\Documentos\\NetBeansProjects\\CanchaPro\\persistencia/canchas.csv";
     
     
-    public void leerCanchas() {
+  public void leerCanchas() {
     cantidadCanchas = 0;
 
-    try {
-        BufferedReader lector = new BufferedReader(new FileReader(rutacancha));
-        lector.readLine();
+    try (BufferedReader lector = new BufferedReader(new FileReader(rutacancha))) {
+        lector.readLine(); // Saltar encabezado
+
         String linea;
 
-        while ((linea = lector.readLine()) != null && cantidadCanchas < 100) {
+        while ((linea = lector.readLine()) != null
+                && cantidadCanchas < canchas.length) {
 
-            String[] datos = linea.replace("\"", "").split(",");
-            String codigo = datos[0];
-            String nombre = datos[1];
-            int tipo = Integer.parseInt(datos[2].replace("Fútbol", "").trim());
-            String[] horario = datos[4].split("–");
-            LocalTime apertura = LocalTime.parse(horario[0]);
-            LocalTime cierre = LocalTime.parse(horario[1]);
-            double precio = Double.parseDouble(datos[5]);
-            String estado = datos[6];
+            if (linea.trim().isEmpty()) {
+                continue;
+            }
 
-            Cancha cancha = new Cancha(codigo, nombre, tipo, precio, estado, apertura, cierre);
-            cancha.setActivo(Boolean.parseBoolean(datos[7]));
+            String[] datos = linea.replace("\"", "").split(",", -1);
+
+            if (datos.length < 8) {
+                System.out.println("Fila de cancha incompleta: " + linea);
+                continue;
+            }
+
+            String codigo = datos[0].trim();
+            String nombre = datos[1].trim();
+            int tipo = Integer.parseInt(
+                    datos[2].replace("Fútbol", "").trim()
+            );
+
+            String[] horario = datos[4].split("–", -1);
+            LocalTime apertura = LocalTime.parse(horario[0].trim());
+            LocalTime cierre = LocalTime.parse(horario[1].trim());
+
+            double precio = Double.parseDouble(datos[5].trim());
+
+            boolean activo = Boolean.parseBoolean(datos[7].trim());
+
+            // Si el CSV dice INACTIVA, respetamos ese estado.
+            if (datos[6].trim().equalsIgnoreCase("INACTIVA")) {
+                activo = false;
+            }
+
+            String estado = activo ? "ACTIVA" : "INACTIVA";
+
+            Cancha cancha = new Cancha(
+                    codigo, nombre, tipo, precio, estado, apertura, cierre
+            );
+            cancha.setActivo(activo);
 
             canchas[cantidadCanchas] = cancha;
             cantidadCanchas++;
         }
 
-        lector.close();
+        System.out.println("Canchas leídas: " + cantidadCanchas);
 
-    } catch (IOException e) {
-        System.out.println("Error al leer el CSV: " + e.getMessage());
+    } catch (IOException | RuntimeException e) {
+        System.out.println("Error al leer canchas: " + e.getMessage());
+        e.printStackTrace();
     }
 }
     
@@ -152,38 +178,85 @@ public class PersistenciaCancha {
         return false;
     }
     
-    public void guardarCanchas() {
-        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(rutacancha))) {
-            escritor.write("Código,Cancha,Tipo,Capacidad,Horario,PrecioHora,Estado,Activo");
-            escritor.newLine();
+        public void mostrarCanchas(javax.swing.JTable tabla, String filtro) {
+        String[] columnas = {
+            "Código", "Cancha", "Tipo", "Capacidad", "Precio por hora", "Estado"
+        };
 
-            for (int i = 0; i < cantidadCanchas; i++) {
-                Cancha cancha = canchas[i];
+        javax.swing.table.DefaultTableModel modelo =
+                new javax.swing.table.DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
 
-                String horario = cancha.getHoraApertura()
-                        + "–" + cancha.getHoraCierre();
+        for (int i = 0; i < cantidadCanchas; i++) {
+            Cancha cancha = canchas[i];
 
-                String fila = cancha.getCodigo() + ","
-                        + cancha.getNombre() + ","
-                        + "Fútbol " + cancha.getTipoFutbol() + ","
-                        + cancha.getLimitePorEquipo() + " jugadores,"
-                        + horario + ","
-                        + cancha.getPrecioHora() + ","
-                        + cancha.getEstado() + ","
-                        + cancha.isActivo();
-
-                escritor.write(fila);
-                escritor.newLine();
+            if (cancha == null) {
+                continue;
             }
 
-            JOptionPane.showMessageDialog(null, "Canchas guardadas.");
+            String estado = cancha.isActivo()
+                    ? cancha.getEstado()
+                    : "INACTIVA";
 
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                null, "Error al guardar: " + e.getMessage()
-            );
+            if (!filtro.equalsIgnoreCase("TODAS")
+                    && !estado.equalsIgnoreCase(filtro)) {
+                continue;
+            }
+
+            modelo.addRow(new Object[]{
+                cancha.getCodigo(),
+                cancha.getNombre(),
+                "Fútbol " + cancha.getTipoFutbol(),
+                cancha.getLimitePorEquipo(),
+                String.format("Q %.2f", cancha.getPrecioHora()),
+                estado
+            });
         }
+
+        tabla.setModel(modelo);
     }
+    
+        public boolean guardarCanchas() {
+    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(rutacancha))) {
+        escritor.write("Código,Cancha,Tipo,Capacidad,Horario,PrecioHora,Estado,Activo");
+        escritor.newLine();
+
+        for (int i = 0; i < cantidadCanchas; i++) {
+            Cancha cancha = canchas[i];
+
+            if (cancha == null) {
+                continue;
+            }
+
+            // Solo guardamos el estado permanente de la cancha.
+            String estado = cancha.isActivo() ? "ACTIVA" : "INACTIVA";
+
+            escritor.write(
+                cancha.getCodigo() + ","
+                + cancha.getNombre().replace(",", " ") + ","
+                + "Fútbol " + cancha.getTipoFutbol() + ","
+                + cancha.getLimitePorEquipo() + " jugadores,"
+                + cancha.getHoraApertura() + "–" + cancha.getHoraCierre() + ","
+                + String.format(java.util.Locale.US, "%.2f", cancha.getPrecioHora()) + ","
+                + estado + ","
+                + cancha.isActivo()
+            );
+            escritor.newLine();
+        }
+
+        return true;
+
+    } catch (IOException e) {
+        System.out.println("Error al guardar canchas: " + e.getMessage());
+        return false;
+    }
+}
+    
+  
     
    
 }

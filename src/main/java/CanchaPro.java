@@ -1,6 +1,6 @@
 import Grafica.Login;
-import Grafica.Grafica;
 import Grafica.nuevaCancha;
+import Grafica.Grafica;
 
 import Archivos.Cancha;
 import Archivos.Cliente;
@@ -9,6 +9,8 @@ import Archivos.Reserva;
 import Cerebro.PersistenciaCancha;
 import Cerebro.PersistenciaClientes;
 import Cerebro.PersistenciaReservas;
+
+import Grafica.Tienda;
 
 
 

@@ -4,7 +4,9 @@ import Archivos.Cliente;
 import Archivos.Cancha;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -24,11 +26,12 @@ public class PersistenciaReservas {
         this.persistenciaCanchas = persistenciaCanchas;
     }
         
-   String rutareserva = "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia/reservas.csv";
+   String rutareserva = "C:\\Users\\juan1\\OneDrive\\Documentos\\NetBeansProjects\\CanchaPro\\persistencia/reservas.csv";
    
     private static final int CAPACIDAD = 1000;
     private Reserva[] reservas = new Reserva[CAPACIDAD];
     private int cantidad;
+    private CalcularPrecio calculadora = new CalcularPrecio();
 
     
     public void leerReservas() {
@@ -52,12 +55,24 @@ public class PersistenciaReservas {
             LocalDate.parse(datos[3].trim()),
             LocalTime.parse(datos[5].trim()),
             Integer.parseInt(datos[6].trim()),
-            Integer.parseInt(datos[8].trim()),  // cantidad de balones
-            Integer.parseInt(datos[9].trim()),  // cantidad de árbitros
-            Integer.parseInt(datos[10].trim())  // cantidad de chalecos
+            Integer.parseInt(datos[8].trim()),  
+            Integer.parseInt(datos[9].trim()), 
+            Integer.parseInt(datos[10].trim())  
     );
 
                 reserva.setEstado(datos[4].trim());
+               
+                        if (datos.length >= 14) {
+                            reserva.setSubtotalCancha(
+                                    Double.parseDouble(datos[11].trim())
+                            );
+                            reserva.setTotalExtras(
+                                    Double.parseDouble(datos[12].trim())
+                            );
+                            reserva.setTotalReserva(
+                                    Double.parseDouble(datos[13].trim())
+                            );
+                        }
        
                     if (datos.length > 14 && !datos[14].trim().isEmpty()) {
                         reserva.setFechaCancelacion(
@@ -82,9 +97,11 @@ public class PersistenciaReservas {
 
         System.out.println("Reservas leídas: " + cantidad);
 
-    } catch (IOException e) {
-        System.out.println("Error al leer el archivo: " + e.getMessage());
-    }
+   } catch (IOException | RuntimeException e) {
+    System.out.println("Error al leer reservas: " + e.getMessage());
+    e.printStackTrace();
+    ordenarReservas();
+}
     
     
 }
@@ -235,63 +252,95 @@ public class PersistenciaReservas {
 
         tabla.setModel(modelo);
     }
+
+        public void mostrarReservasPorEstado(
+               javax.swing.JTable tabla,
+               String estadoSeleccionado,
+               PersistenciaPago persistenciaPagos) {
+
+           String[] columnas = {
+               "Reserva (código)",
+               "Cliente (nombre)",
+               "Cancha (nombre)",
+               "Fecha",
+               "Horario (inicio-final)",
+               "Duración",
+               "Estado",
+               "Balones",
+               "Árbitros",
+               "Chalecos",
+               "Total Q",
+               "Pagado Q",
+               "Pendiente Q",
+               "Fecha de cancelación",
+               "Usuario responsable",
+               "Motivo"
+           };
+
+           javax.swing.table.DefaultTableModel modelo =
+                   new javax.swing.table.DefaultTableModel(columnas, 0) {
+               @Override
+               public boolean isCellEditable(int fila, int columna) {
+                   return false;
+               }
+           };
+
+           for (int i = 0; i < cantidad; i++) {
+               Reserva reserva = reservas[i];
+
+               if (reserva == null) {
+                   continue;
+               }
+
+               // Si se eligió un estado específico, omite las demás reservas.
+               if (!estadoSeleccionado.equalsIgnoreCase("TODAS")
+                       && !reserva.getEstado().equalsIgnoreCase(estadoSeleccionado)) {
+                   continue;
+               }
+
+               double totalReserva = reserva.getTotalReserva();
+               double pagado = persistenciaPagos.getTotalPagadoReserva(
+                       reserva.getIdReserva()
+               );
+               double pendiente = Math.max(0, totalReserva - pagado);
+
+               // Las cotizaciones no se presentan como deuda.
+               if (reserva.getEstado().equalsIgnoreCase("PENDIENTE")) {
+                   pagado = 0;
+                   pendiente = 0;
+               }
+
+               modelo.addRow(new Object[]{
+                   "R" + String.format("%03d", reserva.getIdReserva()),
+                   reserva.getCliente() == null ? "" : reserva.getCliente().getNombre(),
+                   reserva.getCancha() == null ? "" : reserva.getCancha().getNombre(),
+                   reserva.getFecha(),
+                   reserva.getHoraInicio() + " - " + reserva.getHoraFinal(),
+                   reserva.getDuracionHoras(),
+                   reserva.getEstado(),
+                   reserva.getBalon(),
+                   reserva.getArbitro(),
+                   reserva.getChalecos(),
+                   String.format("Q %.2f", totalReserva),
+                   String.format("Q %.2f", pagado),
+                   String.format("Q %.2f", pendiente),
+                   reserva.getFechaCancelacion() == null
+                           ? ""
+                           : reserva.getFechaCancelacion().toString().replace("T", " "),
+                   reserva.getUsuarioResponsableCancelacion() == null
+                           ? ""
+                           : reserva.getUsuarioResponsableCancelacion(),
+                   reserva.getMotivoCancelacion() == null
+                           ? ""
+                           : reserva.getMotivoCancelacion()
+               });
+           }
+
+           tabla.setModel(modelo);
+       }
     
-  public void mostrarTodasReservas(
-        JTable tabla,
-        PersistenciaPago persistenciaPagos) {
-
-    DefaultTableModel modelo =
-            (DefaultTableModel) tabla.getModel();
-
-    modelo.setRowCount(0); 
-
-    for (int i = 0; i < cantidad; i++) {
-        Reserva reserva = reservas[i];
-
-        if (reserva == null) {
-            continue;
-        }
-
-        double total = reserva.getTotalReserva();
-
-        double pagado = persistenciaPagos.getTotalPagadoReserva(
-                reserva.getIdReserva()
-        );
-
-        double pendiente = Math.max(0, total - pagado);
-
-        
-        if (reserva.getEstado().equalsIgnoreCase("PENDIENTE")) {
-            pagado = 0;
-            pendiente = 0;
-        }
-
-        modelo.addRow(new Object[]{
-            "R" + String.format("%03d", reserva.getIdReserva()),
-            reserva.getCliente().getNombre(),
-            reserva.getCancha().getNombre(),
-            reserva.getFecha(),
-            reserva.getHoraInicio() + " - " + reserva.getHoraFinal(),
-            reserva.getDuracionHoras(),
-            reserva.getEstado(),
-            reserva.getBalon(),
-            reserva.getArbitro(),
-            reserva.getChalecos(),
-            String.format("Q %.2f", total),
-            String.format("Q %.2f", pagado),
-            String.format("Q %.2f", pendiente),
-            reserva.getFechaCancelacion() == null
-                    ? ""
-                    : reserva.getFechaCancelacion().toString().replace("T", " "),
-            reserva.getUsuarioResponsableCancelacion() == null
-                    ? ""
-                    : reserva.getUsuarioResponsableCancelacion(),
-            reserva.getMotivoCancelacion() == null
-                    ? ""
-                    : reserva.getMotivoCancelacion()
-        });
-    }
-}
+    
+    
     
     public int getCantidadReservas() {
     return cantidad;
@@ -410,11 +459,6 @@ public class PersistenciaReservas {
 
         String estado = reserva.getEstado();
 
-        if (!estado.equalsIgnoreCase("CONFIRMADA")
-                && !estado.equalsIgnoreCase("EN_CURSO")) {
-            continue;
-        }
-
         java.time.LocalDateTime inicio = java.time.LocalDateTime.of(
                 reserva.getFecha(),
                 reserva.getHoraInicio()
@@ -425,14 +469,25 @@ public class PersistenciaReservas {
                 reserva.getHoraFinal()
         );
 
+        // Una cotización sin pago vence cuando llega su hora de inicio.
+        if (estado.equalsIgnoreCase("PENDIENTE")
+                && !ahora.isBefore(inicio)) {
+            reserva.setEstado("VENCIDA");
+            huboCambios = true;
+            continue;
+        }
+
+        if (!estado.equalsIgnoreCase("CONFIRMADA")
+                && !estado.equalsIgnoreCase("EN_CURSO")) {
+            continue;
+        }
+
         if (!ahora.isBefore(fin)) {
-            // La hora final ya pasó.
             reserva.setEstado("FINALIZADA");
             huboCambios = true;
 
         } else if (estado.equalsIgnoreCase("CONFIRMADA")
                 && !ahora.isBefore(inicio)) {
-            // Ya empezó, pero todavía no termina.
             reserva.setEstado("EN_CURSO");
             huboCambios = true;
         }
@@ -443,51 +498,117 @@ public class PersistenciaReservas {
     
     
     
-    
-    
-    
-    public boolean guardarReservas() {
-        try (java.io.BufferedWriter escritor =
-                new java.io.BufferedWriter(new java.io.FileWriter(rutareserva))) {
+   public boolean guardarReservas() {
+    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(rutareserva))) {
+        escritor.write(
+            "idReserva,codigoCliente,codigoCancha,fecha,estado,"
+            + "horaInicio,duracion,horaFinal,balon,arbitro,chalecos,"
+            + "subtotalCancha,totalExtras,totalReserva,"
+            + "fechaCancelacion,motivoCancelacion,usuarioResponsableCancelacion"
+        );
+        escritor.newLine();
+
+        for (int i = 0; i < cantidad; i++) {
+            Reserva r = reservas[i];
 
             escritor.write(
-                "idReserva,codigoCliente,codigoCancha,fecha,estado,"
-                + "horaInicio,duracion,horaFinal,balon,arbitro,chalecos,"
-                + "subtotalCancha,totalExtras,totalReserva"
+                "R" + String.format("%03d", r.getIdReserva()) + ","
+                + r.getCliente().getCodigo() + ","
+                + r.getCancha().getCodigo() + ","
+                + r.getFecha() + ","
+                + r.getEstado() + ","
+                + r.getHoraInicio() + ","
+                + r.getDuracionHoras() + ","
+                + r.getHoraFinal() + ","
+                + r.getBalon() + ","
+                + r.getArbitro() + ","
+                + r.getChalecos() + ","
+                + String.format(java.util.Locale.US, "%.2f", r.getSubtotalCancha()) + ","
+                + String.format(java.util.Locale.US, "%.2f", r.getTotalExtras()) + ","
+                + String.format(java.util.Locale.US, "%.2f", r.getTotalReserva()) + ","
+                + (r.getFechaCancelacion() == null ? "" : r.getFechaCancelacion()) + ","
+                + (r.getMotivoCancelacion() == null ? "" : r.getMotivoCancelacion().replace(",", " ")) + ","
+                + (r.getUsuarioResponsableCancelacion() == null ? "" : r.getUsuarioResponsableCancelacion())
             );
             escritor.newLine();
+        }
 
-            for (int i = 0; i < cantidad; i++) {
-                Reserva r = reservas[i];
+        return true;
+    } catch (IOException e) {
+        System.out.println("Error al guardar reservas: " + e.getMessage());
+        return false;
+    }
+}
+    
+   public void mostrarReservasPorRangoFechas(
+        javax.swing.JTable tabla,
+        java.time.LocalDate desde,
+        java.time.LocalDate hasta,
+        PersistenciaPago persistenciaPagos) {
 
-                escritor.write(
-                    "R" + String.format("%03d", r.getIdReserva()) + ","
-                    + r.getCliente().getCodigo() + ","
-                    + r.getCancha().getCodigo() + ","
-                    + r.getFecha() + ","
-                    + r.getEstado() + ","
-                    + r.getHoraInicio() + ","
-                    + r.getDuracionHoras() + ","
-                    + r.getHoraFinal() + ","
-                    + r.getBalon() + ","
-                    + r.getArbitro() + ","
-                    + r.getChalecos() + ","
-                    + String.format("%.2f", r.getSubtotalCancha()) + ","
-                    + String.format("%.2f", r.getTotalExtras()) + ","
-                    + String.format("%.2f", r.getTotalReserva())
-                );
-                escritor.newLine();
-            }
+    String[] columnas = {
+        "Reserva", "Cliente", "Cancha", "Fecha", "Horario",
+        "Duración", "Estado", "Balones", "Árbitros", "Chalecos",
+        "Total Q", "Pagado Q", "Pendiente Q",
+        "Fecha de cancelación", "Usuario responsable", "Motivo"
+    };
 
-            return true;
-
-        } catch (IOException e) {
-            System.out.println("Error al guardar reservas: " + e.getMessage());
+    javax.swing.table.DefaultTableModel modelo =
+            new javax.swing.table.DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int fila, int columna) {
             return false;
         }
+    };
+
+    for (int i = 0; i < cantidad; i++) {
+        Reserva reserva = reservas[i];
+
+        if (reserva == null
+                || reserva.getFecha().isBefore(desde)
+                || reserva.getFecha().isAfter(hasta)) {
+            continue;
+        }
+
+        double total = reserva.getTotalReserva();
+        double pagado = persistenciaPagos.getTotalPagadoReserva(
+                reserva.getIdReserva()
+        );
+        double pendiente = Math.max(0, total - pagado);
+
+        // Las cotizaciones todavía no cuentan como deuda ni como pago.
+        if (reserva.getEstado().equalsIgnoreCase("PENDIENTE")) {
+            pagado = 0;
+            pendiente = 0;
+        }
+
+        modelo.addRow(new Object[]{
+            "R" + String.format("%03d", reserva.getIdReserva()),
+            reserva.getCliente() == null ? "" : reserva.getCliente().getNombre(),
+            reserva.getCancha() == null ? "" : reserva.getCancha().getNombre(),
+            reserva.getFecha(),
+            reserva.getHoraInicio() + " - " + reserva.getHoraFinal(),
+            reserva.getDuracionHoras(),
+            reserva.getEstado(),
+            reserva.getBalon(),
+            reserva.getArbitro(),
+            reserva.getChalecos(),
+            String.format("Q %.2f", total),
+            String.format("Q %.2f", pagado),
+            String.format("Q %.2f", pendiente),
+            reserva.getFechaCancelacion() == null
+                    ? ""
+                    : reserva.getFechaCancelacion().toString().replace("T", " "),
+            reserva.getUsuarioResponsableCancelacion() == null
+                    ? ""
+                    : reserva.getUsuarioResponsableCancelacion(),
+            reserva.getMotivoCancelacion() == null
+                    ? ""
+                    : reserva.getMotivoCancelacion()
+        });
     }
 
-    
-    
+    tabla.setModel(modelo);
+}
       
 }

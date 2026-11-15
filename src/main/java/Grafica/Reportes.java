@@ -251,9 +251,9 @@ private void colorearFilasPorEstado() {
         ));
         jScrollPane1.setViewportView(tablareporte);
 
-        Panelreserva.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 1750, 290));
+        Panelreserva.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 1750, 500));
 
-        atras.setBackground(new java.awt.Color(0, 153, 255));
+        atras.setBackground(new java.awt.Color(255, 102, 102));
         atras.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
         atras.setText("Salir");
         atras.addActionListener(this::atrasActionPerformed);
@@ -310,31 +310,31 @@ private void colorearFilasPorEstado() {
         filtroReporte.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODAS", "PENDIENTE", "CONFIRMADA", "EN_CURSO", "FINALIZADA", "CANCELADA", "VENCIDA" }));
         filtroReporte.addActionListener(this::filtroReporteActionPerformed);
 
-        tienda.setBackground(new java.awt.Color(204, 255, 255));
+        tienda.setBackground(new java.awt.Color(153, 255, 255));
         tienda.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         tienda.setText("Tienda");
         tienda.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         tienda.addActionListener(this::tiendaActionPerformed);
 
-        pagos.setBackground(new java.awt.Color(204, 255, 255));
+        pagos.setBackground(new java.awt.Color(153, 255, 255));
         pagos.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         pagos.setText("Pagos");
         pagos.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pagos.addActionListener(this::pagosActionPerformed);
 
-        canchas.setBackground(new java.awt.Color(204, 255, 255));
+        canchas.setBackground(new java.awt.Color(153, 255, 255));
         canchas.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         canchas.setText("Canchas");
         canchas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         canchas.addActionListener(this::canchasActionPerformed);
 
-        reservas.setBackground(new java.awt.Color(204, 255, 255));
+        reservas.setBackground(new java.awt.Color(153, 255, 255));
         reservas.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         reservas.setText("Reservas");
         reservas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         reservas.addActionListener(this::reservasActionPerformed);
 
-        clientes.setBackground(new java.awt.Color(204, 255, 255));
+        clientes.setBackground(new java.awt.Color(153, 255, 255));
         clientes.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         clientes.setText("Clientes");
         clientes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -346,9 +346,13 @@ private void colorearFilasPorEstado() {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(reservas, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(canchas, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(pagos, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
                 .addComponent(tienda, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(filtroReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)

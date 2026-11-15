@@ -1,0 +1,27 @@
+nombre,telefono,email,codigo,estado,fechaRegistro
+Ana García,96612552,ana.c001@example.com,C001,true,2025-01-01
+Luis García,23968409,luis.c002@example.com,C002,true,2025-03-15
+María García,82213401,maria.c003@example.com,C003,true,2025-05-27
+Carlos García,27914445,carlos.c004@example.com,C004,true,2025-08-08
+Sofía García,31536774,sofia.c005@example.com,C005,true,2025-10-20
+Diego García,31045809,diego.c006@example.com,C006,true,2026-01-01
+Valentina García,62258906,valentina.c007@example.com,C007,true,2026-03-15
+José García,74039398,jose.c008@example.com,C008,false,2026-05-27
+Camila García,88162222,camila.c009@example.com,C009,false,2026-08-08
+Andrés García,92925823,andres.c010@example.com,C010,true,2026-10-20
+Ana López,93632637,ana.c011@example.com,C011,false,2025-02-20
+Luis López,78902025,luis.c012@example.com,C012,true,2025-05-04
+María López,49976608,maria.c013@example.com,C013,false,2025-07-16
+Carlos López,38403772,carlos.c014@example.com,C014,true,2025-09-27
+Sofía López,25621779,sofia.c015@example.com,C015,true,2025-12-09
+Diego López,65299689,diego.c016@example.com,C016,true,2026-02-20
+Valentina López,29836686,valentina.c017@example.com,C017,true,2026-05-04
+José López,69686779,jose.c018@example.com,C018,true,2026-07-16
+Camila López,58602276,camila.c019@example.com,C019,true,2026-09-27
+Andrés López,66650788,andres.c020@example.com,C020,true,2025-01-28
+Ana Martínez,95651938,ana.c021@example.com,C021,true,2025-04-11
+Luis Martínez,94462565,luis.c022@example.com,C022,false,2025-06-23
+María Martínez,81941367,maria.c023@example.com,C023,true,2025-09-04
+Carlos Martínez,88202436,carlos.c024@example.com,C024,true,2025-11-16
+Sofía Martínez,10484642,sofia.c025@example.com,C025,true,2026-01-28
+Jaun Manuel,25655252,sfasfsfadsfsfds,C026,true,2026-11-13

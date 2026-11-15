@@ -1,0 +1,8 @@
+Código,Cancha,Tipo,Capacidad,Horario,PrecioHora,Estado,Activo
+C01,La Bombonera,Fútbol 5,8 jugadores,08:00–23:00,50.00,ACTIVA,true
+C02,El Maracaná,Fútbol 11,15 jugadores,08:00–23:00,300.00,ACTIVA,true
+C03,El Monumental,Fútbol 7,10 jugadores,08:00–23:00,200.00,ACTIVA,true
+C04,La Cantera,Fútbol 5,8 jugadores,08:00–23:00,100.00,ACTIVA,true
+C05,El Camp Nou,Fútbol 11,15 jugadores,08:00–23:00,300.00,ACTIVA,true
+C06,el salazar,Fútbol 7,10 jugadores,00:00–22:00,200.00,INACTIVA,false
+C07,safdsafds,Fútbol 5,8 jugadores,08:00–22:00,456.00,INACTIVA,false

@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 public class PersistenciaClientes {
 
     private String ruta =
-            "C:\\Users\\juan1\\OneDrive\\Desktop\\persistencia\\clientes.csv";
+            "C:\\Users\\juan1\\OneDrive\\Documentos\\NetBeansProjects\\CanchaPro\\persistencia/clientes.csv";
 
     private Cliente[] clientes = new Cliente[1000];
     private int cantidad = 0;
@@ -183,42 +183,71 @@ public class PersistenciaClientes {
         }
     }
 }
+    
+        public void mostrarClientes(javax.swing.JTable tabla, String filtro) {
+        String[] columnas = {
+            "Código", "Nombre", "Teléfono", "Correo", "Estado", "Fecha de registro"
+        };
 
-    public void guardarClientes() {
-        try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ruta))) {
-            escritor.write("nombre,telefono,email,codigo,activo,fechaRegistro");
-            escritor.newLine();
+        javax.swing.table.DefaultTableModel modelo =
+                new javax.swing.table.DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
 
-            for (int i = 0; i < cantidad; i++) {
-                Cliente cliente = clientes[i];
+        for (int i = 0; i < cantidad; i++) {
+            Cliente cliente = clientes[i];
 
-                if (cliente == null) {
-                    continue;
-                }
-
-                String fecha = cliente.getFechaRegistro() == null
-                        ? ""
-                        : cliente.getFechaRegistro().toString();
-
-                escritor.write(
-                        cliente.getNombre() + ","
-                        + cliente.getTelefono() + ","
-                        + cliente.getEmail() + ","
-                        + cliente.getCodigo() + ","
-                        + cliente.isActivo() + ","
-                        + fecha
-                );
-
-                escritor.newLine();
+            if (cliente == null) {
+                continue;
             }
 
-            JOptionPane.showMessageDialog(null, "Clientes guardados.");
+            if (filtro.equalsIgnoreCase("ACTIVOS") && !cliente.isActivo()) {
+                continue;
+            }
 
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Error al guardar clientes: " + e.getMessage()
-            );
+            if (filtro.equalsIgnoreCase("INACTIVOS") && cliente.isActivo()) {
+                continue;
+            }
+
+            modelo.addRow(new Object[]{
+                cliente.getCodigo(),
+                cliente.getNombre(),
+                cliente.getTelefono(),
+                cliente.getEmail(),
+                cliente.isActivo() ? "ACTIVO" : "INACTIVO",
+                cliente.getFechaRegistro()
+            });
         }
+
+        tabla.setModel(modelo);
     }
+
+    public boolean guardarClientes() {
+    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ruta))) {
+        escritor.write("nombre,telefono,email,codigo,estado,fechaRegistro");
+        escritor.newLine();
+
+        for (int i = 0; i < cantidad; i++) {
+            Cliente cliente = clientes[i];
+
+            escritor.write(
+                cliente.getNombre().replace(",", " ") + ","
+                + cliente.getTelefono() + ","
+                + cliente.getEmail() + ","
+                + cliente.getCodigo() + ","
+                + cliente.isActivo() + ","
+                + cliente.getFechaRegistro()
+            );
+            escritor.newLine();
+        }
+
+        return true;
+    } catch (IOException e) {
+        System.out.println("Error al guardar clientes: " + e.getMessage());
+        return false;
+    }
+}
 }
